@@ -1,4 +1,4 @@
-update=Tuesday, March 06, 2018 'pmt' 02:49:32 pm
+update=Wednesday, March 14, 2018 'amt' 11:52:50 am
 version=1
 last_client=kicad
 [pcbnew]
@@ -75,3 +75,4 @@ LibName33=opto
 LibName34=atmel
 LibName35=contrib
 LibName36=valves
+LibName37=switches
