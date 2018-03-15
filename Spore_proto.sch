@@ -383,7 +383,7 @@ U 1 1 5A9F39B8
 P 4300 2900
 F 0 "J3" H 4300 2550 50  0000 C CNN
 F 1 "FTDI to ESP" V 4400 2900 50  0000 C CNN
-F 2 "Pin_Headers:Pin_Header_Straight_1x06_Pitch2.54mm_SMD_Pin1Right" H 4300 2900 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x06_Pitch2.54mm" H 4300 2900 50  0001 C CNN
 F 3 "" H 4300 2900 50  0001 C CNN
 	1    4300 2900
 	-1   0    0    1   
