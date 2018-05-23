@@ -16,6 +16,6 @@ float fwCheckButtonTime = 2000.0f;            // how long to hold button down.
 //const char* fwUrlBase = "http://10.0.3.100/";
 //const char* fwName = "spore_fw";
 
-
+//delete me
 
 #endif /* SETTINGS_H */
