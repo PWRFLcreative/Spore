@@ -9,18 +9,9 @@
 *~
 _autosave-*
 *.tmp
-*-cache.lib
 *-rescue.lib
 *-save.pro
 *-save.kicad_pcb
 
 # Netlist files (exported from Eeschema)
 *.net
-
-# Autorouter files (exported from Pcbnew)
-*.dsn
-*.ses
-
-# Exported BOM files
-*.xml
-*.csv
