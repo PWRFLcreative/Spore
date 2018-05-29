@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <export version="D">
   <design>
-    <source>/Users/bbmatkin/Documents/!SFU/!TANGIBLE/pcb/SPORE_EDA/Spore_proto.sch</source>
+    <source>/Users/bbmatkin/Documents/!SFU/!TANGIBLE/pcb/SPORE_EDA/Spore.sch</source>
     <date>Monday, March 19, 2018 'amt' 11:31:29 am</date>
     <tool>Eeschema 4.0.6</tool>
     <sheet number="1" name="/" tstamps="/">
@@ -10,7 +10,7 @@
         <company/>
         <rev>0.0.3</rev>
         <date>2018-03-06</date>
-        <source>Spore_proto.sch</source>
+        <source>Spore.sch</source>
         <comment number="1" value="SPORE"/>
         <comment number="2" value="Lightwork"/>
         <comment number="3" value="BBM"/>
