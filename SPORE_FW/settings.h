@@ -1,10 +1,18 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include "config.h"   
+// to track and stop tracking config.h: 
+// git update-index --assume-unchanged FILE_NAME 
+// git update-index --no-assume-unchanged FILE_NAME
+
 
 /* -- network settings -- */
-const char* AP_SSID = "SPORE-TEST";
-String deviceName = "Spore_";                 // used for DHCP
+const char* AP_SSID  = "SPORE-TEST";
+const char* ssid     = WIFI_SSID;             // ssid from wifi_config.h
+const char* password = WIFI_PASSWORD;         // password from wifi_config.h
+String deviceName    = "Spore_";              // used for DHCP
+
 
 
 /* -- firmware settings -- */
