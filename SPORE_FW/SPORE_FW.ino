@@ -30,7 +30,6 @@ extern "C" {
 #include <NeoPixelBus.h>
 #include <WiFiManager.h>                // Captive portal wifi setup
 //#include <ESP8266WiFiMulti.h>         // alternate to wifimanager - no portal but remembers multiple access points
-#include <ArduinoOTA.h>                 // simple, direct OTA updates
 
 #define LED_BUILTIN   2                 // not correctly mapped for ESP-12x
 #define BOOTLOAD_PIN  0                 // BOOTLOAD button
@@ -69,9 +68,6 @@ void setup() {
   strip.Begin();
   strip.Show();
 
-  /* OTA */
-  setupOTA();
-
   /* who am I this time?  */
   delay(100);
   Serial.printf("\nWiFi connected.\n");
@@ -87,6 +83,5 @@ void setup() {
 
 
 void loop() {
-  ArduinoOTA.handle();
   
 }
