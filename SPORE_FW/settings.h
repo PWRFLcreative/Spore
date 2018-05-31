@@ -1,7 +1,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include "config.h"   
+#include "wifi_config.h"   
 // to track and stop tracking config.h: 
 // git update-index --assume-unchanged FILE_NAME 
 // git update-index --no-assume-unchanged FILE_NAME
@@ -25,5 +25,7 @@ float fwCheckButtonTime = 2000.0f;            // how long to hold button down.
 //const char* fwName = "spore_fw";
 
 uint8_t address = 99;
+
+
 
 #endif /* SETTINGS_H */
