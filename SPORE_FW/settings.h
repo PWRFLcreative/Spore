@@ -3,7 +3,7 @@
 
 
 /* -- network settings -- */
-const char* AP_SSID = "SPORE";
+const char* AP_SSID = "SPORE-TEST";
 String deviceName = "Spore_";                 // used for DHCP
 
 
@@ -16,6 +16,6 @@ float fwCheckButtonTime = 2000.0f;            // how long to hold button down.
 //const char* fwUrlBase = "http://10.0.3.100/";
 //const char* fwName = "spore_fw";
 
-//delete me
+uint8_t address = 99;
 
 #endif /* SETTINGS_H */

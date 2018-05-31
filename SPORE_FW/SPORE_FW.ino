@@ -23,12 +23,14 @@
 */
 
 extern "C" {
-  #include "user_interface.h"   // allows wifi_set_sleep_type
+  #include "user_interface.h"           // allows wifi_set_sleep_type
 }
-#include "settings.h"
-#include "FS.h"
+#include "settings.h"                   // local settings!
+//#include "FS.h"                       // File System / SPIFFS
 #include <NeoPixelBus.h>
-#include <WiFiManager.h>
+#include <WiFiManager.h>                // Captive portal wifi setup
+//#include <ESP8266WiFiMulti.h>         // alternate to wifimanager - no portal but remembers multiple access points
+#include <ArduinoOTA.h>                 // simple, direct OTA updates
 
 #define LED_BUILTIN   2                 // not correctly mapped for ESP-12x
 #define BOOTLOAD_PIN  0                 // BOOTLOAD button
@@ -38,8 +40,6 @@ NeoGamma<NeoGammaTableMethod> colorGamma;                         // for any fad
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PixelCount, 3);// pin 3 is DMA anyway so the value is actuallly ignored..
 
 WiFiManager wifiManager;
-
-
 
 
 
@@ -57,6 +57,8 @@ void setup() {
     Serial.println("no one connected and I timed out. I'll try to connect (in STA) again!"); delay(3000);
     ESP.reset(); delay(5000);
   }
+  address = WiFi.localIP()[3];                // get address
+  deviceName.concat(address);
 
   /* init LED PIN */
   pinMode(LED_BUILTIN, OUTPUT);
@@ -66,6 +68,9 @@ void setup() {
   delay(100);
   strip.Begin();
   strip.Show();
+
+  /* OTA */
+  setupOTA();
 
   /* who am I this time?  */
   delay(100);
@@ -79,6 +84,9 @@ void setup() {
   yield();
 }
 
+
+
 void loop() {
+  ArduinoOTA.handle();
   
 }
