@@ -39,7 +39,7 @@ const uint16_t PixelCount = 16;                                   // DO NOT CHAN
 NeoGamma<NeoGammaTableMethod> colorGamma;                         // for any fade animations, best to correct gamma
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> pixels(PixelCount);   // pin 3 is DMA anyway so the value is actuallly ignored..
 
-WiFiManager wifiManager;
+//WiFiManager wifiManager;
 E131 e131;
 
 
@@ -54,10 +54,26 @@ void setup() {
   Serial.printf("HW: %s%s\n", HW_VERSION, HW_PHASE);
   Serial.printf("(c)2018 PWRFL\n\n");         // pick open source license
 
-  if (!wifiManager.autoConnect(AP_SSID)) {    // no password for captive portal
-    Serial.println("no one connected and I timed out. I'll try to connect (in STA) again!"); delay(3000);
-    ESP.reset(); delay(5000);
+  /* connect to WiFi */
+  Serial.printf("[INFO] Connecting to: ");
+  Serial.print(ssid);
+  //WiFi.persistent(false);                   // don't re-write ssid/password to flash every time (avoid degredation)
+  WiFi.mode(WIFI_STA);                        // without this ESP will be station and AP at the same time - this can give you headaches!!!
+  WiFi.hostname(deviceName);                  // DHCP Hostname    -- does this even work?!
+  //WiFi.config(staticIP, gateway, subnet);   // set static IP, defaults to DHCP if config not called
+  WiFi.begin(ssid, password);                 // connect to your existing network
+  int restartCounter = 0;
+  while (!WiFi.isConnected()) {               // auto reset if it's not connecting (occasionally hangs otherwise)
+    delay(100); Serial.print("."); 
+    restartCounter++;
+    if (restartCounter > 50) ESP.restart();   // if it takes more than 5 (50x100ms) seconds to connect, restart!
   }
+  Serial.printf("  connected.\n");            // yay it worked!
+//  if (!wifiManager.autoConnect(AP_SSID)) {    // no password for captive portal
+//    Serial.println("no one connected and I timed out. I'll try to connect (in STA) again!"); delay(3000);
+//    ESP.reset(); delay(5000);
+//  }
+
   //address = WiFi.localIP()[3];              // get address
   address = 1;                                // TESTING - just set to 1 manually for now
   deviceName.concat(address);
@@ -94,14 +110,15 @@ void setup() {
 
 void loop() {
   if (e131.parsePacket()) {
-    uint8_t r = e131.data[address];
-    uint8_t g = e131.data[address+1];
-    uint8_t b = e131.data[address+2];
+    uint8_t r = e131.data[address-1];   // address is currently "1" for testing. 
+    uint8_t g = e131.data[address];
+    uint8_t b = e131.data[address+1];
     RgbColor col = colorGamma.Correct(RgbColor(r, g, b));
     for (int i = 0; i < PixelCount; i++) {
       pixels.SetPixelColor(i, col);
     }
   }
+  pixels.Show();
 //  uint16_t numChannels = e131.parsePacket();
 //  if (numChannels > 0) {
 //    Serial.printf("Universe %u / %u Channels | Packet#: %u / Errors: %u / CH1: %u\n",
