@@ -30,6 +30,7 @@ extern "C" {
 #include <NeoPixelBus.h>
 #include <WiFiManager.h>                // Captive portal wifi setup
 //#include <ESP8266WiFiMulti.h>         // alternate to wifimanager - no portal but remembers multiple access points
+#include <E131.h>                       // sACN (e1.31) library
 
 #define LED_BUILTIN   2                 // not correctly mapped for ESP-12x
 #define BOOTLOAD_PIN  0                 // BOOTLOAD button
@@ -39,6 +40,7 @@ NeoGamma<NeoGammaTableMethod> colorGamma;                         // for any fad
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PixelCount, 3);// pin 3 is DMA anyway so the value is actuallly ignored..
 
 WiFiManager wifiManager;
+E131 e131;
 
 
 
@@ -68,6 +70,13 @@ void setup() {
   strip.Begin();
   strip.Show();
 
+  /* sACN */
+  /* The following method creates 
+   * the UDP port and joins the 
+   * multicast group for you.
+   */
+  e131.begin(E131_MULTICAST, 1, 1);           // (E131_UNICAST/E131_MULTICAST, universeNumber,number of universes) 
+
   /* who am I this time?  */
   delay(100);
   Serial.printf("\nWiFi connected.\n");
@@ -83,5 +92,13 @@ void setup() {
 
 
 void loop() {
-  
+  uint16_t numChannels = e131.parsePacket();
+  if (numChannels > 0) {
+    Serial.printf("Universe %u / %u Channels | Packet#: %u / Errors: %u / CH1: %u\n",
+                e131.universe,              // The Universe for this packet
+                numChannels,                // Number of channels in this packet
+                e131.stats.num_packets,     // Packet counter
+                e131.stats.packet_errors,   // Packet error counter
+                e131.data[0]);              // Dimmer data for Channel 1
+    }
 }
