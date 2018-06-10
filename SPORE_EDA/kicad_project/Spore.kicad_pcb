@@ -3,7 +3,7 @@
   (general
     (links 178)
     (no_connects 0)
-    (area 57.53088 59.561999 142.087346 139.984871)
+    (area 47.678572 57.4 151.821429 142.200001)
     (thickness 1.6)
     (drawings 64)
     (tracks 1302)
@@ -61,7 +61,7 @@
     (visible_elements FFFFFF7F)
     (pcbplotparams
       (layerselection 0x010fc_80000001)
-      (usegerberextensions false)
+      (usegerberextensions true)
       (excludeedgelayer true)
       (linewidth 0.100000)
       (plotframeref false)
@@ -78,12 +78,12 @@
       (plotvalue true)
       (plotinvisibletext false)
       (padsonsilk false)
-      (subtractmaskfromsilk false)
-      (outputformat 4)
+      (subtractmaskfromsilk true)
+      (outputformat 1)
       (mirror false)
       (drillshape 0)
       (scaleselection 1)
-      (outputdirectory SPORE_gerbers_v0.0.1/))
+      (outputdirectory ../gerbers+BOM/v1.0.0/))
   )
 
   (net 0 "")
