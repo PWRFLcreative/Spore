@@ -22,8 +22,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+// USE ESP8266 Arduino Core v2.4.0-rc2 (https://github.com/esp8266/Arduino)
+// Board: NodeMCU v1.0
+// Flash Size: 4M (1M SPIFFS)
+// Upload Speed: 230400   --this works consistentnly with classic FTDI. Newer chips may work at 921600
+
 extern "C" {
-#include "user_interface.h"           // allows wifi_set_sleep_type
+  #include "user_interface.h"           // allows wifi_set_sleep_type
 }
 #include "settings.h"                   // local settings!
 //#include "FS.h"                       // File System / SPIFFS
@@ -40,7 +45,7 @@ NeoGamma<NeoGammaTableMethod> colorGamma;                         // for any fad
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> pixels(PixelCount);   // pin 3 is DMA anyway so the value is actuallly ignored..
 
 //WiFiManager wifiManager;
-E131 e131;
+E131 e131;                              // sACN library
 
 
 
@@ -53,6 +58,14 @@ void setup() {
   Serial.printf("FW: %u%s   ", FW_VERSION, FW_PHASE);
   Serial.printf("HW: %s%s\n", HW_VERSION, HW_PHASE);
   Serial.printf("(c)2018 PWRFL\n\n");         // pick open source license
+
+    /* LEDs */
+  delay(100);
+  pixels.Begin();
+  for (int i = 0; i < PixelCount; i++) {
+    pixels.SetPixelColor(i, RgbColor(0));
+  }
+  pixels.Show();
 
   /* connect to WiFi */
   Serial.printf("[INFO] Connecting to: ");
@@ -80,20 +93,17 @@ void setup() {
 
   /* init LED PIN */
   pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);             // low is on
+  digitalWrite(LED_BUILTIN, HIGH);             // low is on
 
-  /* LEDs */
-  delay(100);
-  pixels.Begin();
-  pixels.Show();
 
   /* sACN
      The following method creates
      the UDP port and joins the
      multicast group for you.
   */
+  Serial.printf("Starting sACN: ");
   e131.begin(E131_MULTICAST, 1, 1);           // (E131_UNICAST/E131_MULTICAST, universeNumber,number of universes)
-
+  
   /* who am I this time?  */
   delay(100);
   Serial.printf("\nWiFi connected.\n");
@@ -110,15 +120,22 @@ void setup() {
 
 void loop() {
   if (e131.parsePacket()) {
-    uint8_t r = e131.data[address-1];   // address is currently "1" for testing. 
+    uint8_t r = e131.data[address-1];           // address is currently "1" for testing. 
     uint8_t g = e131.data[address];
     uint8_t b = e131.data[address+1];
     RgbColor col = colorGamma.Correct(RgbColor(r, g, b));
     for (int i = 0; i < PixelCount; i++) {
       pixels.SetPixelColor(i, col);
     }
+    digitalWrite(LED_BUILTIN, HIGH);            // (low is on)
   }
   pixels.Show();
+  
+  digitalWrite(LED_BUILTIN, HIGH);              // turn off LED at the end of every loop (low is on)
+  yield();
+}
+
+// e131 sample parse: 
 //  uint16_t numChannels = e131.parsePacket();
 //  if (numChannels > 0) {
 //    Serial.printf("Universe %u / %u Channels | Packet#: %u / Errors: %u / CH1: %u\n",
@@ -128,4 +145,3 @@ void loop() {
 //                  e131.stats.packet_errors,   // Packet error counter
 //                  e131.data[0]);              // Dimmer data for Channel 1
 //  }
-}
