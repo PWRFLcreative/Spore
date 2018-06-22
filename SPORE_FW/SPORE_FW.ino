@@ -22,37 +22,42 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// USE ESP8266 Arduino Core v2.4.0-rc2 (https://github.com/esp8266/Arduino)
-// Board: NodeMCU v1.0
-// Flash Size: 4M (1M SPIFFS)
-// Upload Speed: 230400   --this works consistentnly with classic FTDI. Newer chips may work at 921600
+/*
+ * USE ESP8266 Arduino Core v2.4.0-rc2 (https://github.com/esp8266/Arduino)
+ * Board: NodeMCU v1.0
+ * Flash Size: 4M (1M SPIFFS)
+ * Upload Speed: 230400   --this works consistentnly with classic FTDI. Newer chips may work at 921600
+*/
+
 
 extern "C" {
   #include "user_interface.h"           // allows wifi_set_sleep_type
 }
+
 #include "settings.h"                   // local settings!
 //#include "FS.h"                       // File System / SPIFFS
 #include <NeoPixelBus.h>
-#include <WiFiManager.h>                // Captive portal wifi setup
 //#include <ESP8266WiFiMulti.h>         // alternate to wifimanager - no portal but remembers multiple access points
 #include <E131.h>                       // sACN (e1.31) library
 
 #define LED_BUILTIN   2                 // not correctly mapped for ESP-12x
 #define BOOTLOAD_PIN  0                 // BOOTLOAD button
 
+
+
 const uint16_t PixelCount = 16;                                   // DO NOT CHANGE!!
 NeoGamma<NeoGammaTableMethod> colorGamma;                         // for any fade animations, best to correct gamma
-NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> pixels(PixelCount);   // pin 3 is DMA anyway so the value is actuallly ignored..
+NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> pixels(PixelCount);  // This is DMA so uses GPIO 3 (alawys same physical pin as U0RXD)
 
-//WiFiManager wifiManager;
 E131 e131;                              // sACN library
 
 
 
 
+/******** SETUP ********/
 
 void setup() {
-  wifi_set_sleep_type(NONE_SLEEP_T);          // disable sleep (added this when trying to fix analogRead issue.. )
+  wifi_set_sleep_type(NONE_SLEEP_T);          // disable wifi sleep (added this when trying to fix analogRead issue.. is it still needed?)
   Serial.begin(115200);
   Serial.printf("\n\n\nSPORE\n");
   Serial.printf("FW: %u%s   ", FW_VERSION, FW_PHASE);
@@ -82,13 +87,10 @@ void setup() {
     if (restartCounter > 50) ESP.restart();   // if it takes more than 5 (50x100ms) seconds to connect, restart!
   }
   Serial.printf("  connected.\n");            // yay it worked!
-//  if (!wifiManager.autoConnect(AP_SSID)) {    // no password for captive portal
-//    Serial.println("no one connected and I timed out. I'll try to connect (in STA) again!"); delay(3000);
-//    ESP.reset(); delay(5000);
-//  }
 
   //address = WiFi.localIP()[3];              // get address
   address = 1;                                // TESTING - just set to 1 manually for now
+  //String macAddress = WiFi.macAddress();    
   deviceName.concat(address);
 
   /* init LED PIN */
@@ -97,18 +99,17 @@ void setup() {
 
 
   /* sACN
-     The following method creates
+     The e131.begin() method creates
      the UDP port and joins the
      multicast group for you.
   */
   Serial.printf("Starting sACN: ");
-  e131.begin(E131_MULTICAST, 1, 1);           // (E131_UNICAST/E131_MULTICAST, universeNumber,number of universes)
+  e131.begin(E131_MULTICAST, 1, 1);           // (E131_UNICAST <or> E131_MULTICAST, universeNumber, number of universes)
   
   /* who am I this time?  */
   delay(100);
   Serial.printf("\nWiFi connected.\n");
   Serial.printf("\nIP address:  ");
-  //Serial.println(DMX_AP ? WiFi.softAPIP() : WiFi.localIP());
   Serial.println(WiFi.localIP());
   //if (ENABLE_WEBSOCKET) Serial.printf("Websocket looking for server at: %s:%u\n", serverIP.toString().c_str(), wsPort);
   Serial.printf("%s (%s) ready. \n", deviceName.c_str(), WiFi.macAddress().c_str());
@@ -118,8 +119,12 @@ void setup() {
 
 
 
+
+/******** LOOP ********/
+
 void loop() {
   if (e131.parsePacket()) {
+    /* NOTE: ADDRESSES SHOULD PROBABLY START AT 0 IF WE ARE NOT DERIVING THEM FROM OR ASSIGNING THEM TO IP ADDRESSES */
     uint8_t r = e131.data[address-1];           // address is currently "1" for testing. 
     uint8_t g = e131.data[address];
     uint8_t b = e131.data[address+1];
@@ -135,13 +140,16 @@ void loop() {
   yield();
 }
 
-// e131 sample parse: 
-//  uint16_t numChannels = e131.parsePacket();
-//  if (numChannels > 0) {
-//    Serial.printf("Universe %u / %u Channels | Packet#: %u / Errors: %u / CH1: %u\n",
-//                  e131.universe,              // The Universe for this packet
-//                  numChannels,                // Number of channels in this packet
-//                  e131.stats.num_packets,     // Packet counter
-//                  e131.stats.packet_errors,   // Packet error counter
-//                  e131.data[0]);              // Dimmer data for Channel 1
-//  }
+
+/*
+ e131 sample parse: 
+  uint16_t numChannels = e131.parsePacket();
+  if (numChannels > 0) {
+    Serial.printf("Universe %u / %u Channels | Packet#: %u / Errors: %u / CH1: %u\n",
+                  e131.universe,              // The Universe for this packet
+                  numChannels,                // Number of channels in this packet
+                  e131.stats.num_packets,     // Packet counter
+                  e131.stats.packet_errors,   // Packet error counter
+                  e131.data[0]);              // Dimmer data for Channel 1
+  }
+*/

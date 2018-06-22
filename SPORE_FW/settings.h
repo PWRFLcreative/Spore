@@ -1,6 +1,10 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>    // necessary?
+#include <WiFiUDP.h>
+
 #include "wifi_config.h"   
 // to track and stop tracking config.h: 
 // git update-index --assume-unchanged FILE_NAME 
