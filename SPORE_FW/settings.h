@@ -13,10 +13,11 @@
 
 /* -- network settings -- */
 const char* AP_SSID  = "SPORE-TEST";
-const char* ssid     = WIFI_SSID;        // ssid from wifi_config.h
-const char* password = WIFI_PASSWORD;    // password from wifi_config.h
-String deviceName    = "Spore_";         // used for DHCP
-
+const char* ssid     = WIFI_SSID;         // ssid from wifi_config.h
+const char* password = WIFI_PASSWORD;     // password from wifi_config.h
+String deviceName    = "Spore_";          // used for DHCP
+IPAddress serverIP(10, 0, 1, 100);        // server IP address
+uint16_t wsPort      = 7777;              // websocket connection port
 
 
 /* -- firmware settings -- */

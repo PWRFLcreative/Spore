@@ -35,6 +35,8 @@ extern "C" {
 }
 
 #include "settings.h"                   // local settings!
+#include "otaFirmware.h"                // over the air firmware updates!
+#include "serverControl.h"
 //#include "FS.h"                       // File System / SPIFFS
 #include <NeoPixelBus.h>
 //#include <ESP8266WiFiMulti.h>         // alternate to wifimanager - no portal but remembers multiple access points
@@ -105,13 +107,18 @@ void setup() {
   */
   Serial.printf("Starting sACN: ");
   e131.begin(E131_MULTICAST, 1, 1);           // (E131_UNICAST <or> E131_MULTICAST, universeNumber, number of universes)
+
+  /* setup websockets */
+  webSocket.begin(serverIP.toString(), wsPort, "/");
+  webSocket.onEvent(webSocketEvent);
+  webSocket.setReconnectInterval(5000);       // TODO: Do I need to manually ping/pong?? 
   
   /* who am I this time?  */
   delay(100);
   Serial.printf("\nWiFi connected.\n");
   Serial.printf("\nIP address:  ");
   Serial.println(WiFi.localIP());
-  //if (ENABLE_WEBSOCKET) Serial.printf("Websocket looking for server at: %s:%u\n", serverIP.toString().c_str(), wsPort);
+  Serial.printf("Looking for Websocket server at: %s:%u\n", serverIP.toString().c_str(), wsPort);
   Serial.printf("%s (%s) ready. \n", deviceName.c_str(), WiFi.macAddress().c_str());
   Serial.printf("\n---\n\n");
   yield();
