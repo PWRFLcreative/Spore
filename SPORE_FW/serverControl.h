@@ -15,12 +15,13 @@ WebSocketsClient webSocket;
 
 
 // eg. message types in server
-//#define MSG_TYPE_SET_ADDRESS      0
-//#define MSG_TYPE_SET_MODE         1
-//#define MSG_TYPE_CHECK_FIRMWARE   2
-//#define MSG_TYPE_CONFIG           3
-//#define MSG_TYPE_REBOOT           4
-//#define MSG_TYPE_REQUEST_ADDRESS  5
+//const MSG_TYPE_SET_ADDRESS      = 0
+//const MSG_TYPE_SET_MODE         = 1
+//const MSG_TYPE_CHECK_FIRMWARE   = 2
+//const MSG_TYPE_CONFIG           = 3
+//const MSG_TYPE_REBOOT           = 4
+//const MSG_TYPE_SCAN             = 5
+//const MSG_TYPE_REQUEST_ADDRESS  = 6
 
 enum MsgType : uint8_t  {
   SET_ADDRESS = 0,
@@ -28,9 +29,32 @@ enum MsgType : uint8_t  {
   CHECK_FIRMWARE,
   CONFIG,
   REBOOT,
+  SCAN,
   REQUEST_ADDRESS             // (send only) = send MAC to server for address request
 };
 
+const uint16_t jsonSendSize = 256;
+void serializeJSON_connected(char * json) {
+  StaticJsonBuffer<jsonSendSize> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+//  root["type"] = MSG_TYPE_CONNECT_INFO;
+//  // JsonObject& data = root.createNestedObject("data");
+//  // data["id"] = address;
+//  // data["firmwareVersion"] = FW_VERSION;
+//  root["id"] = address;
+//  root["firmwareVersion"] = FW_VERSION;
+  root.printTo(json, jsonSendSize);
+  Serial.println(json);
+}
+
+void serializeJSON_scan(char * json) {
+  StaticJsonBuffer<jsonSendSize> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+  root["type"] = (uint8_t)REQUEST_ADDRESS;
+  root["data"] = WiFi.macAddress();
+  root.printTo(json, jsonSendSize);
+  Serial.println(json);
+}
 
 //TODO: periodically attempt to reconnect to server if down. Use websocket ping/pong?
 //      I think websocket library does this automagically
@@ -49,7 +73,8 @@ bool deserializeJSON(uint8_t * json) {
     switch (type) {
       case SET_ADDRESS: {
           uint8_t _addr = root["data"];                     // ** placeholder **
-          Serial.printf("[ws] <SET_ADDRESS>: %u\n", _addr);
+          address = _addr;
+          Serial.printf("[ws] <SET_ADDRESS>: %u\n", address);
         }
         break;
       case SET_MODE: {
@@ -78,26 +103,18 @@ bool deserializeJSON(uint8_t * json) {
         Serial.printf("\n\n[ws] <REBOOT> Rebooting now!");
         ESP.restart();
         break;
+      case SCAN:
+        Serial.printf("[ws] <SCAN> sending REQUEST_ADDRESS\n");
+        char scanJSON[jsonSendSize];
+        serializeJSON_scan(scanJSON);
+        webSocket.sendTXT(scanJSON);        // send to server
+        break;
       default:
         Serial.printf("[ws] err: Unrecognized Message Type\n");
         break;
     }
   }
   return root.success();
-}
-
-const uint16_t jsonSendSize = 256;
-void serializeJSON_connected(char * json) {
-  StaticJsonBuffer<jsonSendSize> jsonBuffer;
-  JsonObject& root = jsonBuffer.createObject();
-//  root["type"] = MSG_TYPE_CONNECT_INFO;
-//  // JsonObject& data = root.createNestedObject("data");
-//  // data["id"] = address;
-//  // data["firmwareVersion"] = FW_VERSION;
-//  root["id"] = address;
-//  root["firmwareVersion"] = FW_VERSION;
-  root.printTo(json, jsonSendSize);
-  Serial.println(json);
 }
 
 

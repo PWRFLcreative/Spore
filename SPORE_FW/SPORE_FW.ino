@@ -91,7 +91,7 @@ void setup() {
   Serial.printf("  connected.\n");            // yay it worked!
 
   //address = WiFi.localIP()[3];              // get address
-  address = 1;                                // TESTING - just set to 1 manually for now
+  address = 0;                                // TESTING - just set to 1 manually for now
   //String macAddress = WiFi.macAddress();    
   deviceName.concat(address);
 
@@ -130,11 +130,12 @@ void setup() {
 /******** LOOP ********/
 
 void loop() {
+  webSocket.loop();
   if (e131.parsePacket()) {
     /* NOTE: ADDRESSES SHOULD PROBABLY START AT 0 IF WE ARE NOT DERIVING THEM FROM OR ASSIGNING THEM TO IP ADDRESSES */
-    uint8_t r = e131.data[address-1];           // address is currently "1" for testing. 
-    uint8_t g = e131.data[address];
-    uint8_t b = e131.data[address+1];
+    uint8_t r = e131.data[address*CHAN_PER_FIXTURE];           // address starts at 0 
+    uint8_t g = e131.data[address*CHAN_PER_FIXTURE+1];
+    uint8_t b = e131.data[address*CHAN_PER_FIXTURE+2];
     RgbColor col = colorGamma.Correct(RgbColor(r, g, b));
     for (int i = 0; i < PixelCount; i++) {
       pixels.SetPixelColor(i, col);
