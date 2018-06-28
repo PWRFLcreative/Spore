@@ -22,6 +22,7 @@ WebSocketsClient webSocket;
 //const MSG_TYPE_REBOOT           = 4
 //const MSG_TYPE_SCAN             = 5
 //const MSG_TYPE_REQUEST_ADDRESS  = 6
+//const MSG_TYPE_CONNECT_INFO     = 7
 
 enum MsgType : uint8_t  {
   SET_ADDRESS = 0,
@@ -30,19 +31,18 @@ enum MsgType : uint8_t  {
   CONFIG,
   REBOOT,
   SCAN,
-  REQUEST_ADDRESS             // (send only) = send MAC to server for address request
+  REQUEST_ADDRESS,
+  CONNECT_INFO
 };
 
 const uint16_t jsonSendSize = 256;
 void serializeJSON_connected(char * json) {
   StaticJsonBuffer<jsonSendSize> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
-//  root["type"] = MSG_TYPE_CONNECT_INFO;
-//  // JsonObject& data = root.createNestedObject("data");
-//  // data["id"] = address;
-//  // data["firmwareVersion"] = FW_VERSION;
-//  root["id"] = address;
-//  root["firmwareVersion"] = FW_VERSION;
+  root["type"] = (uint8_t)CONNECT_INFO;
+  JsonObject& data = root.createNestedObject("data");
+  data["address"] = (uint8_t)address;
+  data["firmwareVersion"] = FW_VERSION;
   root.printTo(json, jsonSendSize);
   Serial.println(json);
 }
@@ -74,6 +74,8 @@ bool deserializeJSON(uint8_t * json) {
       case SET_ADDRESS: {
           uint8_t _addr = root["data"];                     // ** placeholder **
           address = _addr;
+          EEPROM.write(0, address);
+          EEPROM.commit();
           Serial.printf("[ws] <SET_ADDRESS>: %u\n", address);
         }
         break;

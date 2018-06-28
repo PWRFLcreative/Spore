@@ -4,6 +4,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>    // necessary?
 #include <WiFiUDP.h>
+#include <EEPROM.h>
 
 #include "wifi_config.h"   
 // to track and stop tracking config.h: 
@@ -17,14 +18,15 @@ const char* ssid     = WIFI_SSID;         // ssid from wifi_config.h
 const char* password = WIFI_PASSWORD;     // password from wifi_config.h
 String deviceName    = "Spore_";          // used for DHCP
 //IPAddress serverIP(10, 0, 1, 100);        // server IP address
-IPAddress serverIP(192, 168, 1, 65);        // server IP address
+//IPAddress serverIP(192, 168, 1, 65);        // server IP address
+IPAddress serverIP(10, 10, 10, 100);      // server IP address
 uint16_t wsPort      = 8080;              // websocket connection port
 
 
 /* -- firmware settings -- */
 #define HW_VERSION "0.0.3"
 #define HW_PHASE   "-beta"
-const int FW_VERSION = 101;              // 0.1.00, convention: 1.2.10 = 1210, 0.5.9 = 509, no leading 0s or it is interpreted as octal.. learned that the hard way!
+const int FW_VERSION = 105;              // 0.1.00, convention: 1.2.10 = 1210, 0.5.9 = 509, no leading 0s or it is interpreted as octal.. learned that the hard way!
 #define FW_PHASE   "-alpha"
 //float fwCheckButtonTime = 2000.0f;     // how long to hold button down.
 

@@ -66,6 +66,14 @@ void setup() {
   Serial.printf("HW: %s%s\n", HW_VERSION, HW_PHASE);
   Serial.printf("(c)2018 PWRFL\n\n");         // pick open source license
 
+  EEPROM.begin(512);
+  //EEPROM.get(0, address);
+  address = EEPROM.read(0);
+  //address = WiFi.localIP()[3];              // get address
+  //address = 0;                                // TESTING - just set to 1 manually for now
+  //String macAddress = WiFi.macAddress();    
+  deviceName.concat(address);
+  
     /* LEDs */
   delay(100);
   pixels.Begin();
@@ -90,11 +98,6 @@ void setup() {
   }
   Serial.printf("  connected.\n");            // yay it worked!
 
-  //address = WiFi.localIP()[3];              // get address
-  address = 0;                                // TESTING - just set to 1 manually for now
-  //String macAddress = WiFi.macAddress();    
-  deviceName.concat(address);
-
   /* init LED PIN */
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);             // low is on
@@ -118,6 +121,7 @@ void setup() {
   Serial.printf("\nWiFi connected.\n");
   Serial.printf("\nIP address:  ");
   Serial.println(WiFi.localIP());
+  Serial.printf("sACN address: %u\n", address);
   Serial.printf("Looking for Websocket server at: %s:%u\n", serverIP.toString().c_str(), wsPort);
   Serial.printf("%s (%s) ready. \n", deviceName.c_str(), WiFi.macAddress().c_str());
   Serial.printf("\n---\n\n");
