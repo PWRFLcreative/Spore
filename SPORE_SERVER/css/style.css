@@ -1,0 +1,45 @@
+/*chromium selection error workaround */
+::selection {
+  /*background:rgba(255, 255, 125, 0.99);
+  color:#032764;*/
+  background:rgba(254, 115, 106, 0.83);
+  color: #333333;
+}
+body, input, textarea, button {
+  color: #333333;
+  /*font-family: 'Montserrat-Regular';*/
+  font-family: 'Inconsolata-Regular';
+}
+
+@font-face {
+  font-family: 'Inconsolata-Regular';
+  src: url('../fonts/Inconsolata-Regular.ttf');
+  font-family: 'Montserrat-Regular';
+  src: url('../fonts/Montserrat-Regular.ttf');
+}
+
+h1 {
+  font-family: 'Inconsolata-Regular';
+}
+h2 {
+  font-family: 'Inconsolata-Regular';
+}
+
+button {
+  width: 30%;
+  height: 30px;
+  font-size:0.8em;
+  margin: 1%;
+  border:none;
+  cursor: pointer;
+  background-color:#EEE;
+}
+
+#status-console {
+  border: 1px solid #333;
+  margin:0;
+  padding:3px;
+  height:3em;
+  text-overflow:clip;
+  overflow-y:scroll;
+}

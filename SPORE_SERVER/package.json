@@ -1,0 +1,20 @@
+{
+  "name": "test-app",
+  "version": "0.0.1",
+  "description": "a test app",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "author": "Brendan",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^2.0.2"
+  },
+  "dependencies": {
+    "electron-reload": "^1.2.2",
+    "express": "^4.16.3",
+    "ip": "^1.1.5"
+  }
+}
