@@ -105,33 +105,43 @@ let addressScanning = false
   setInterval(() => {pingWS()}, config.ping_interval)
 
   function onMessageWS(_msg) {
-    const msg = JSON.parse(_msg)
-
-    if (msg.type != undefined) {
-      if (msg.type == MSG_TYPE_CONNECT_INFO) {
-        if (msg.data != undefined) {
-          console.log("[wss] device %s connected. FW:%s", msg.data.address, msg.data.firmwareVersion)
-        }
+    const msg = 0;
+    if (_msg) {
+      try {
+        msg = JSON.parse(_msg)
       }
-      else if (msg.type == MSG_TYPE_REQUEST_ADDRESS) {
-        if (msg.data != undefined) {
-          console.log("[wss] address requested from: %s", msg.data)
-          let response = {
-            type: MSG_TYPE_SET_ADDRESS,
-            data: addressCounter
+      catch(e) {
+        console.log("[wss] not JSON: ", _msg)
+        remoteStatusConsole('print-message', 'JSON error')
+        return;
+      }
+
+      if (msg.type != undefined) {
+        if (msg.type == MSG_TYPE_CONNECT_INFO) {
+          if (msg.data != undefined) {
+            console.log("[wss] device %s connected. FW:%s", msg.data.address, msg.data.firmwareVersion)
           }
-          let addr = (addressCounter < 10) ? (addressCounter+ " ") : addressCounter    // align MACs for debug
-          console.log("[wss] address: %s    sent to: %s", addr, msg.data)
-          addressCounter++;
-          this.send(JSON.stringify(response))
+        }
+        else if (msg.type == MSG_TYPE_REQUEST_ADDRESS) {
+          if (msg.data != undefined) {
+            console.log("[wss] address requested from: %s", msg.data)
+            let response = {
+              type: MSG_TYPE_SET_ADDRESS,
+              data: addressCounter
+            }
+            let addr = (addressCounter < 10) ? (addressCounter+ " ") : addressCounter    // align MACs for debug
+            console.log("[wss] address: %s    sent to: %s", addr, msg.data)
+            addressCounter++;
+            this.send(JSON.stringify(response))
+          }
+        }
+        else {
+          console.log("[wss] message type: %s", msg.type)
         }
       }
       else {
-        console.log("[wss] message type: %s", msg.type)
+        console.log("[wss] received empty message")
       }
-    }
-    else {
-      console.log("[wss] received empty message")
     }
   }
 

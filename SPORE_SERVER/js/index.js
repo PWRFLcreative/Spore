@@ -40,6 +40,9 @@ ipcRenderer.on('clear-status-console', (event) => {
 ipcRenderer.on('devices-connected', (event, arg) => {
   statusConsole(arg + " devices connected.")
 })
+ipcRenderer.on('print-message', (event, arg) => {
+  statusConsole(arg)
+})
 
 
 
