@@ -2,7 +2,7 @@
     SPORE FIRMWARE
     Copyright (C) 2018 PWRFL
 
-    @authors Leó Stefánsson, Tim Rolls, and Brendan Matkin
+    @authors Tim Rolls, and Brendan Matkin
 
     This sketch contains the firmware for the "Spore" hardware.
     The intent is to create an installation that periodically remaps wireless LEDs ("Spores")
@@ -41,6 +41,11 @@ extern "C" {
 #include <NeoPixelBus.h>
 //#include <ESP8266WiFiMulti.h>         // alternate to wifimanager - no portal but remembers multiple access points
 #include <E131.h>                       // sACN (e1.31) library
+
+/*  switch to async??? https://github.com/forkineye/ESPAsyncE131  
+    uses this: https://github.com/me-no-dev/ESPAsyncUDP
+*/
+
 
 #define LED_BUILTIN   2                 // not correctly mapped for ESP-12x
 #define BOOTLOAD_PIN  0                 // BOOTLOAD button

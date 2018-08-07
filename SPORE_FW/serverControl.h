@@ -8,7 +8,8 @@
 */
 
 #include <ArduinoJson.h>
-#include <WebSocketsClient.h>
+//#include <WebSocketsClient.h>
+#include "src/lib/WebSockets/src/WebSocketsClient.h"  // setup for async (~line 90 of WebSockets.h)
 #include <Hash.h>
 
 WebSocketsClient webSocket;
