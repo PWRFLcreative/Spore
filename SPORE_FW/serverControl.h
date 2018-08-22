@@ -8,11 +8,10 @@
 */
 
 #include <ArduinoJson.h>
-//#include <WebSocketsClient.h>
-#include "src/lib/WebSockets/src/WebSocketsClient.h"  // setup for async (~line 90 of WebSockets.h). why this folder structure?: https://forum.arduino.cc/index.php?topic=445230.0
+
 #include <Hash.h>
 
-WebSocketsClient webSocket;
+
 
 
 // eg. message types in server
@@ -106,11 +105,18 @@ bool deserializeJSON(uint8_t * json) {
         break;
       case CHECK_FIRMWARE: {
           uint16_t newFirmwareVersion = root["data"]["version"];
-          String fwUrlBase = root["data"]["url"].as<String>();
-          String fwName = root["data"]["filename"].as<String>();
-          Serial.printf("[ws] <CHECK_FIRWMARE>: %s%s, new version: %u\n", fwUrlBase.c_str(), fwName.c_str(), newFirmwareVersion);
-          checkForNewFirmware(newFirmwareVersion, fwUrlBase, fwName);
-          // don't do too much in here, MAYBE better just to set flags and check in loop
+          fwUrlBase = root["data"]["url"].as<String>();
+          fwFilename = root["data"]["filename"].as<String>();
+          Serial.printf("[ws] <CHECK_FIRWMARE>: %s%s, current version/new version: %u/%u\n", fwUrlBase.c_str(), fwFilename.c_str(), FW_VERSION, newFirmwareVersion);
+
+          // set flag and do check in the loop, otherwise http-client fails to connect (maybe a buffer overrun from async)
+          if (newFirmwareVersion > FW_VERSION) {
+            webSocket.disconnect();                 // THIS IS PROBABLY NOT NECESSARY
+            checkForFW = true;
+          }
+          else {
+            Serial.println("[OTA] Already using latest version");
+          }
         }
         break;
       case CONFIG: {

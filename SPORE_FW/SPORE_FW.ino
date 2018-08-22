@@ -141,7 +141,7 @@ void setup() {
 /******** LOOP ********/
 
 void loop() {
-  webSocket.loop();
+  //webSocket.loop();                           // remove for async
   static uint32_t pingTimer;
   if (millis() - pingTimer > pingInterval) {
     webSocket.sendPing();                       // ping server to recognize a dropped TCP connection
@@ -160,6 +160,11 @@ void loop() {
     digitalWrite(LED_BUILTIN, HIGH);            // (low is on)
   }
   pixels.Show();
+
+  if (checkForFW) {
+    checkForNewFirmware(fwUrlBase, fwFilename);
+    checkForFW = false;
+  }
 
   digitalWrite(LED_BUILTIN, HIGH);              // turn off LED at the end of every loop (low is on)
   yield();
