@@ -9,7 +9,7 @@
 
 #include <ArduinoJson.h>
 //#include <WebSocketsClient.h>
-#include "src/lib/WebSockets/src/WebSocketsClient.h"  // setup for async (~line 90 of WebSockets.h)
+#include "src/lib/WebSockets/src/WebSocketsClient.h"  // setup for async (~line 90 of WebSockets.h). why this folder structure?: https://forum.arduino.cc/index.php?topic=445230.0
 #include <Hash.h>
 
 WebSocketsClient webSocket;
@@ -82,7 +82,26 @@ bool deserializeJSON(uint8_t * json) {
         break;
       case SET_MODE: {
           uint8_t _mode = root["data"];                     // ** placeholder **
-          Serial.printf("[ws] <SET_MODE>: %u\n", _mode);
+          Serial.printf("[ws] <SET_MODE>: ");
+          currentMode = (Mode)_mode;
+          switch (currentMode) {
+            case NORMAL: {
+                Serial.printf("NORMAL\n");
+              }
+              break;
+            case TEST: {
+                Serial.printf("NORMAL\n");
+              }
+              break;
+            case SLEEP: {
+                Serial.printf("NORMAL\n");
+              }
+            break;
+            default:
+              Serial.printf("err: (unknown mode)\n");
+              break;
+          }
+//          Serial.printf("[ws] <SET_MODE>: %u\n", _mode);
         }
         break;
       case CHECK_FIRMWARE: {

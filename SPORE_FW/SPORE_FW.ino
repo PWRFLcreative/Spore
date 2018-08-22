@@ -23,10 +23,10 @@
 */
 
 /*
- * USE ESP8266 Arduino Core v2.4.0-rc2 (https://github.com/esp8266/Arduino)
- * Board: NodeMCU v1.0
- * Flash Size: 4M (1M SPIFFS)
- * Upload Speed: 230400   --this works consistentnly with classic FTDI. Newer chips may work at 921600
+   USE ESP8266 Arduino Core v2.4.2 (https://github.com/esp8266/Arduino)
+   Board: NodeMCU v1.0
+   Flash Size: 4M (1M SPIFFS)
+   Upload Speed: 230400   --this works consistentnly with classic FTDI. Newer chips may work at 921600
 */
 
 
@@ -42,7 +42,7 @@ extern "C" {
 //#include <ESP8266WiFiMulti.h>         // alternate to wifimanager - no portal but remembers multiple access points
 #include <E131.h>                       // sACN (e1.31) library
 
-/*  switch to async??? https://github.com/forkineye/ESPAsyncE131  
+/*  switch to async??? https://github.com/forkineye/ESPAsyncE131
     uses this: https://github.com/me-no-dev/ESPAsyncUDP
 */
 
@@ -76,10 +76,10 @@ void setup() {
   address = EEPROM.read(0);
   //address = WiFi.localIP()[3];              // get address
   //address = 0;                                // TESTING - just set to 1 manually for now
-  //String macAddress = WiFi.macAddress();    
+  //String macAddress = WiFi.macAddress();
   deviceName.concat(address);
-  
-    /* LEDs */
+
+  /* LEDs */
   delay(100);
   pixels.Begin();
   for (int i = 0; i < PixelCount; i++) {
@@ -97,9 +97,9 @@ void setup() {
   WiFi.begin(ssid, password);                 // connect to your existing network
   int restartCounter = 0;
   while (!WiFi.isConnected()) {               // auto reset if it's not connecting (occasionally hangs otherwise)
-    delay(100); Serial.print("."); 
+    delay(100); Serial.print(".");
     restartCounter++;
-    if (restartCounter > 50) ESP.restart();   // if it takes more than 5 (50x100ms) seconds to connect, restart!
+    if (restartCounter > 70) ESP.restart();   // if it takes more than 5 (50x100ms) seconds to connect, restart!
   }
   Serial.printf("  connected.\n");            // yay it worked!
 
@@ -119,17 +119,19 @@ void setup() {
   /* setup websockets */
   webSocket.begin(serverIP.toString(), wsPort, "/");
   webSocket.onEvent(webSocketEvent);
-  webSocket.setReconnectInterval(5000);       // TODO: Do I need to manually ping/pong?? 
-  
+  webSocket.setReconnectInterval(5000);       // TODO: Do I need to manually ping/pong??
+
   /* who am I this time?  */
   delay(100);
-  Serial.printf("\nWiFi connected.\n");
-  Serial.printf("\nIP address:  ");
+  Serial.printf("\nConnection details:\n");
+  Serial.printf("IP address:  ");
   Serial.println(WiFi.localIP());
   Serial.printf("sACN address: %u\n", address);
-  Serial.printf("Looking for Websocket server at: %s:%u\n", serverIP.toString().c_str(), wsPort);
+  Serial.printf("Listening to Websocket server at: %s:%u\n", serverIP.toString().c_str(), wsPort);
   Serial.printf("%s (%s) ready. \n", deviceName.c_str(), WiFi.macAddress().c_str());
   Serial.printf("\n---\n\n");
+
+  currentMode = NORMAL;
   yield();
 }
 
@@ -140,11 +142,17 @@ void setup() {
 
 void loop() {
   webSocket.loop();
+  static uint32_t pingTimer;
+  if (millis() - pingTimer > pingInterval) {
+    webSocket.sendPing();                       // ping server to recognize a dropped TCP connection
+    pingTimer = millis();
+  }
+  
   if (e131.parsePacket()) {
     /* NOTE: ADDRESSES SHOULD PROBABLY START AT 0 IF WE ARE NOT DERIVING THEM FROM OR ASSIGNING THEM TO IP ADDRESSES */
-    uint8_t r = e131.data[address*CHAN_PER_FIXTURE];           // address starts at 0 
-    uint8_t g = e131.data[address*CHAN_PER_FIXTURE+1];
-    uint8_t b = e131.data[address*CHAN_PER_FIXTURE+2];
+    uint8_t r = e131.data[address * CHAN_PER_FIXTURE];         // address starts at 0
+    uint8_t g = e131.data[address * CHAN_PER_FIXTURE + 1];
+    uint8_t b = e131.data[address * CHAN_PER_FIXTURE + 2];
     RgbColor col = colorGamma.Correct(RgbColor(r, g, b));
     for (int i = 0; i < PixelCount; i++) {
       pixels.SetPixelColor(i, col);
@@ -152,14 +160,14 @@ void loop() {
     digitalWrite(LED_BUILTIN, HIGH);            // (low is on)
   }
   pixels.Show();
-  
+
   digitalWrite(LED_BUILTIN, HIGH);              // turn off LED at the end of every loop (low is on)
   yield();
 }
 
 
 /*
- e131 sample parse: 
+  e131 sample parse:
   uint16_t numChannels = e131.parsePacket();
   if (numChannels > 0) {
     Serial.printf("Universe %u / %u Channels | Packet#: %u / Errors: %u / CH1: %u\n",

@@ -18,9 +18,9 @@ const char* AP_SSID  = "SPORE-TEST";
 const char* ssid     = WIFI_SSID;         // ssid from wifi_config.h
 const char* password = WIFI_PASSWORD;     // password from wifi_config.h
 String deviceName    = "Spore_";          // used for DHCP
-//IPAddress serverIP(10, 0, 1, 100);        // server IP address
+IPAddress serverIP(10, 0, 1, 100);        // server IP address
 //IPAddress serverIP(192, 168, 1, 65);        // server IP address
-IPAddress serverIP(10, 10, 10, 100);      // server IP address
+//IPAddress serverIP(10, 10, 10, 100);      // server IP address
 uint16_t wsPort      = 8080;              // websocket connection port
 
 
@@ -35,7 +35,14 @@ const int FW_VERSION = 200;              // 0.2.00, convention: 1.2.10 = 1210, 0
 /* -- general settings -- */
 #define CHAN_PER_FIXTURE 3               // number of channels per fixture
 uint8_t address = 99;
+const uint32_t pingInterval = 5000;
 
+
+enum Mode : uint8_t {
+  NORMAL = 0,
+  TEST = 99,
+  SLEEP = 255
+}currentMode;
 
 
 
