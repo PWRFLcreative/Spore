@@ -105,13 +105,14 @@ let addressScanning = false
   setInterval(() => {pingWS()}, config.ping_interval)
 
   function onMessageWS(_msg) {
-    const msg = 0;
+    let msg = 0;
     if (_msg) {
       try {
         msg = JSON.parse(_msg)
       }
       catch(e) {
-        console.log("[wss] not JSON: ", _msg)
+        // this might need some cleanup still? -
+        console.log("[wss] JSON parse error: ", e)
         remoteStatusConsole('print-message', 'JSON error')
         return;
       }
@@ -164,7 +165,7 @@ let addressScanning = false
               url: "http://" + ip.address() + ":" + config.firmware_server_port + "/",
               filename: config.firmware_filename
             }
-    };
+    }
     broadcastWSS(JSON.stringify( msg ))
     console.log("[ipc] check Firmware")
   })
@@ -178,6 +179,16 @@ let addressScanning = false
     }
     broadcastWSS(JSON.stringify(msg))
     console.log("[ipc] scan devices")
+  })
+
+  ipcMain.on('setMode', (event, arg) => {
+    let msg = {
+      type: MSG_TYPE_SET_MODE,
+      data: arg
+    }
+    broadcastWSS(JSON.stringify(msg))
+    //console.log("[ipc] setMode: %u", arg)
+    console.log("[ipc] setMode: " + arg)
   })
 
   function remoteStatusConsole(msg, data) {
