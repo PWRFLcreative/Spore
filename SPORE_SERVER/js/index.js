@@ -10,7 +10,7 @@ let button_mode2   = document.getElementById('modeButton2')
 
 
 window.onload = () => {
-  statusConsole("chillin'..")
+  statusConsole("ready and waiting with bated breath")
 }
 
 
@@ -46,7 +46,7 @@ ipcRenderer.on('clear-status-console', (event) => {
   clearStatusConsole()
 })
 ipcRenderer.on('devices-connected', (event, arg) => {
-  statusConsole(arg + " devices connected.")
+  statusConsole(arg + " devices connected")
 })
 ipcRenderer.on('print-message', (event, arg) => {
   statusConsole(arg)

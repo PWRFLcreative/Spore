@@ -78,7 +78,8 @@ let addressScanning = false
     let remoteIP = req.connection.remoteAddress
     console.log("[wss] %s connected", remoteIP)
     remoteStatusConsole('devices-connected', wss.clients.size)  // this might not be accurate (if a device reconnects it returns expected size +1)
-
+    prevClientsSize = wss.clients.size
+    
     _ws.isAlive = true
     _ws.on('pong', heartbeatWS)
     _ws.on('message', onMessageWS)
@@ -133,6 +134,10 @@ let addressScanning = false
             let addr = (addressCounter < 10) ? (addressCounter+ " ") : addressCounter    // align MACs for debug
             console.log("[wss] address: %s    sent to: %s", addr, msg.data)
             addressCounter++;
+            if (wss.clients.size == addressCounter) {
+              console.log("[wss] addressing complete (%s devices)", addressCounter)
+              remoteStatusConsole('print-message', "addressing " + addressCounter + " device(s) complete")
+            }
             this.send(JSON.stringify(response))
           }
         }
@@ -178,7 +183,7 @@ let addressScanning = false
       type: MSG_TYPE_SCAN
     }
     broadcastWSS(JSON.stringify(msg))
-    console.log("[ipc] scan devices")
+    console.log("[ipc] scanning %s devices", wss.clients.size)
   })
 
   ipcMain.on('setMode', (event, arg) => {
