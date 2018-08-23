@@ -79,7 +79,7 @@ let addressScanning = false
     console.log("[wss] %s connected", remoteIP)
     remoteStatusConsole('devices-connected', wss.clients.size)  // this might not be accurate (if a device reconnects it returns expected size +1)
     prevClientsSize = wss.clients.size
-    
+
     _ws.isAlive = true
     _ws.on('pong', heartbeatWS)
     _ws.on('message', onMessageWS)
@@ -89,6 +89,7 @@ let addressScanning = false
     this.isAlive = true       // 'this' refers to the device that sent the pong
     //remoteStatusConsole('devices-connected', wss.clients.size)
   }
+
 
   let prevClientsSize = 0
   function pingWS() {
@@ -105,11 +106,12 @@ let addressScanning = false
   }
   setInterval(() => {pingWS()}, config.ping_interval)
 
+
   function onMessageWS(_msg) {
     let msg = 0;
     if (_msg) {
       try {
-        msg = JSON.parse(_msg)
+        msg = JSON.parse(_msg)            // check for a valid JSON payload
       }
       catch(e) {
         // this might need some cleanup still? -
@@ -118,38 +120,44 @@ let addressScanning = false
         return;
       }
 
-      if (msg.type != undefined) {
-        if (msg.type == MSG_TYPE_CONNECT_INFO) {
-          if (msg.data != undefined) {
-            console.log("[wss] device %s connected. FW:%s", msg.data.address, msg.data.firmwareVersion)
-          }
-        }
-        else if (msg.type == MSG_TYPE_REQUEST_ADDRESS) {
-          if (msg.data != undefined) {
-            console.log("[wss] address requested from: %s", msg.data)
-            let response = {
-              type: MSG_TYPE_SET_ADDRESS,
-              data: addressCounter
+      if (msg.type != undefined) {                  // check for "message type" key (should always have one)
+        switch (msg.type) {
+
+          case MSG_TYPE_CONNECT_INFO:
+            if (msg.data != undefined) {
+              console.log("[wss] device %s connected. FW:%s", msg.data.address, msg.data.firmwareVersion)
             }
-            let addr = (addressCounter < 10) ? (addressCounter+ " ") : addressCounter    // align MACs for debug
-            console.log("[wss] address: %s    sent to: %s", addr, msg.data)
-            addressCounter++;
-            if (wss.clients.size == addressCounter) {
-              console.log("[wss] addressing complete (%s devices)", addressCounter)
-              remoteStatusConsole('print-message', "addressing " + addressCounter + " device(s) complete")
+            break;
+
+          case MSG_TYPE_REQUEST_ADDRESS:
+            if (msg.data != undefined) {
+              console.log("[wss] address requested from: %s", msg.data)
+              let response = {
+                type: MSG_TYPE_SET_ADDRESS,
+                data: addressCounter
+              }
+              let addr = (addressCounter < 10) ? (addressCounter+ " ") : addressCounter    // align MACs for debug
+              console.log("[wss] address: %s    sent to: %s", addr, msg.data)
+              addressCounter++;
+              if (wss.clients.size == addressCounter) {
+                console.log("[wss] addressing complete (%s devices)", addressCounter)
+                remoteStatusConsole('print-message', "addressing " + addressCounter + " device(s) complete")
+              }
+              this.send(JSON.stringify(response))
             }
-            this.send(JSON.stringify(response))
-          }
-        }
-        else {
-          console.log("[wss] message type: %s", msg.type)
+            break;
+
+          default:
+            console.log("[wss] message type: %s", msg.type)
+            break;
         }
       }
       else {
-        console.log("[wss] received empty message")
+        console.log("[wss] invalid message: no message type")
       }
     }
   }
+
 
   function broadcastWSS(msg) {
     wss.clients.forEach((client) => {

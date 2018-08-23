@@ -1,7 +1,7 @@
 {
   "websocket_port" : "8080",
 
-  "firmware_version" : "201",
+  "firmware_version" : "202",
   "firmware_filename" : "spore_fw",
   "firmware_server_port" : "8888",
 
