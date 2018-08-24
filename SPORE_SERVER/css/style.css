@@ -55,7 +55,23 @@ button {
 }
 
 button:hover {
-    background-color: #cccccc;
+    background-color: #0bcbee;
+    color: #fff;
+    /*    filter: hue-rotate(-720deg);
+    */
+    -webkit-filter: none;
+    filter: none;
+    -webkit-animation: hue 3s infinite;
+    animation: hue 3s infinite;
+}
+
+@keyframes hue {
+    0% {
+        -webkit-filter: grayscale(0%) hue-rotate(0deg);
+    }
+    100% {
+        -webkit-filter: grayscale(0%) hue-rotate(360deg);
+    }
 }
 
 #status-console {
