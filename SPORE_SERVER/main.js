@@ -195,7 +195,6 @@ let addressScanning = false
   })
 
   ipcMain.on('scanDevices', (event) => {
-    sendServerIP()
     // [ADDR] clear address array
     addressScanning = true
     addressCounter = 0
@@ -214,6 +213,10 @@ let addressScanning = false
     broadcastWSS(JSON.stringify(msg))
     //console.log("[ipc] setMode: %u", arg)
     console.log("[ipc] setMode: " + arg)
+  })
+
+  ipcMain.on('sendServerIP', (event) => {
+    sendServerIP()
   })
 
   function remoteStatusConsole(msg, data) {

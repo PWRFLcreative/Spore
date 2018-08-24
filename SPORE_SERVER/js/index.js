@@ -2,6 +2,7 @@ const {ipcRenderer} = require('electron')
 
 let status_console = document.getElementById('status-console')
 let button_fw      = document.getElementById('checkFirmwareButton')
+let button_sendip  = document.getElementById('sendIPButton')
 let button_scan    = document.getElementById('scanButton')
 let button_mode0   = document.getElementById('modeButton0')
 let button_mode1   = document.getElementById('modeButton1')
@@ -27,6 +28,11 @@ function statusConsole(msg) {
 function checkFirmware() {
   ipcRenderer.send('checkFirmware')
   statusConsole("devices checking for new firmware..")
+}
+
+function sendServerIP() {
+  ipcRenderer.send('sendServerIP')
+  statusConsole("sending my IP (" + location.host + ") to the spores")
 }
 
 function scanDevices() {
@@ -57,6 +63,7 @@ ipcRenderer.on('print-message', (event, arg) => {
 /* ------ EVENT LISTENERS ------ */
 button_fw.addEventListener('click', checkFirmware)    // maybe try dblclick!
 button_scan.addEventListener('click', scanDevices)
+button_sendip.addEventListener('click', sendServerIP)
 button_mode0.addEventListener('click', () => {setMode(0)})
 button_mode1.addEventListener('click', () => {setMode(1)})
 button_mode2.addEventListener('click', () => {setMode(2)})

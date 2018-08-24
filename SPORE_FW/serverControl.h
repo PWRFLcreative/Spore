@@ -37,23 +37,23 @@ enum MsgType : uint8_t  {
 
 /* ---- OSC Callback: ---- */
 void updateServerIP(OSCMessage &msg, int addressOffset) {
+  bool _serverChanged = false;
   for (int i = 0; i < 4; i++) {
     if (msg.isInt(i)) {
       serverIP[i] = msg.getInt(i);
-      bool _serverChanged = false;
       if (serverIP[i] != EEPROM[i+1]) {
         EEPROM[i+1] = serverIP[i];
         _serverChanged = true;
       }
-      if (_serverChanged) {
-        EEPROM.commit();
-        webSocket.begin(serverIP.toString(), wsPort, "/");
-        Serial.printf("[osc] New Websocket server at: %s:%u\n", serverIP.toString().c_str(), wsPort);
-      }
-      else {
-        Serial.printf("[osc] websocket server unchanged");
-      }
     }
+  }
+  if (_serverChanged) {
+    EEPROM.commit();
+    webSocket.begin(serverIP.toString(), wsPort, "/");
+    Serial.printf("[osc] New Websocket server at: %s:%u\n", serverIP.toString().c_str(), wsPort);
+  }
+  else {
+    Serial.printf("[osc] websocket server unchanged\n");
   }
 }
 

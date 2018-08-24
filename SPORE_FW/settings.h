@@ -33,7 +33,7 @@ uint16_t oscPort = 7777;
 /* -- firmware settings -- */
 #define HW_VERSION "1.0.0"
 #define HW_PHASE   ""
-const int FW_VERSION = 202;              // 0.2.02, convention: 1.2.10 = 1210, 0.5.9 = 509, no leading 0s or it is interpreted as octal.. learned that the hard way!
+const int FW_VERSION = 203;              // 0.2.02, convention: 1.2.10 = 1210, 0.5.9 = 509, no leading 0s or it is interpreted as octal.. learned that the hard way!
 #define FW_PHASE   "-alpha"
 //float fwCheckButtonTime = 2000.0f;     // how long to hold button down.
 
