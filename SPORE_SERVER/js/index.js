@@ -1,4 +1,3 @@
-const BrowserWindow = require('electron').remote.BrowserWindow
 const {ipcRenderer} = require('electron')
 const ip = require('ip')
 
@@ -20,9 +19,8 @@ window.onload = () => {
 
 function openDeviceMonitor() {
   ipcRenderer.send('openDeviceMonitor')
-  statusConsole("opening monitor")
+  //statusConsole("opening monitor")
 }
-
 
 
 function clearStatusConsole() {
@@ -60,7 +58,7 @@ ipcRenderer.on('clear-status-console', (event) => {
   clearStatusConsole()
 })
 ipcRenderer.on('devices-connected', (event, arg) => {
-  statusConsole(arg + " devices connected")
+  statusConsole(arg + " device(s) connected")
 })
 ipcRenderer.on('print-message', (event, arg) => {
   statusConsole(arg)

@@ -47,14 +47,8 @@ let addressCounter = 0
 
 
 /* -------- ELECTRON-RELOAD (monitor file changes and restart): ---------- */
-const path = require('path')
-  // // for some reason, __dirname isn't working here (using **/*.* instead):
-  // require('electron-reload')('**/*.*', {
-  //   //electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
-  //   electron: path.join(__dirname, 'node_modules', 'electron'),
-  //   hardResetMethod: 'exit'
-  // })
-  require('electron-reload')(__dirname,{
+  const path = require('path')
+    require('electron-reload')(__dirname,{
     electron: path.join(__dirname, 'node_modules','.bin', 'electron')
   })
 
@@ -62,7 +56,7 @@ const path = require('path')
 /* --------- ELECTRON --------- */
   function createWindow() {
     // render process:
-    win = new BrowserWindow({width: 600, height: 600, show: false})
+    win = new BrowserWindow({width: 600, height: 600, x: 50, y: 100, show: false})
     win.loadFile('index.html')
 
     win.once('ready-to-show', () => {
@@ -82,9 +76,13 @@ const path = require('path')
       mon = new BrowserWindow({ width: 456, height: 600, show: false })
       mon.loadFile('monitor.html')
       //let _pos = mon.getPosition()
-      mon.setPosition(win.getPosition()[0]+win.getSize()[0], win.getPosition()[1])
+      mon.setPosition( win.getPosition()[0] + win.getSize()[0] + 25, win.getPosition()[1] )
 
+      //updateMonitor(addr, batt, fw)
       mon.once('ready-to-show', () => {
+        wss.clients.forEach((_ws) => {
+          updateMonitor(_ws.isAlive, _ws.address, _ws.battery, _ws.firmware)
+        })
         mon.show()
       })
       mon.on('close', () => {
@@ -92,7 +90,7 @@ const path = require('path')
       })
     }
     else {
-      mon.setPosition(win.getPosition()[0]+win.getSize()[0], win.getPosition()[1])
+      mon.setPosition( win.getPosition()[0] + win.getSize()[0] + 25, win.getPosition()[1] )
       mon.focus()
     }
   }
@@ -118,6 +116,9 @@ const path = require('path')
     prevClientsSize = wss.clients.size
 
     _ws.isAlive = true
+    _ws.address = 999
+    _ws.battery = 0
+    _ws.firmware = 0
     _ws.on('pong', heartbeatWS)
     _ws.on('message', onMessageWS)
     _ws.on('error', (err) => console.log('[_ws] error: ' + err));
@@ -132,7 +133,11 @@ const path = require('path')
   let prevClientsSize = 0
   function pingWS() {
     wss.clients.forEach((_ws) => {
-      if(_ws.isAlive === false) return _ws.terminate()
+      //updateMonitor(_ws.isAlive, _ws.address, _ws.battery, _ws.firmware) // not sure if better here or only on false?
+      if(_ws.isAlive === false) {
+        updateMonitor(_ws.isAlive, _ws.address, _ws.battery, _ws.firmware)
+        return _ws.terminate()
+      }
       _ws.isAlive = false
       _ws.ping(()=>{})  //pass noop function
     })
@@ -163,6 +168,9 @@ const path = require('path')
 
           case MSG_TYPE_CONNECT_INFO:
             if (msg.data != undefined) {
+              this.address = msg.data.address
+              this.firmware = msg.data.firmwareVersion
+              updateMonitor(this.isAlive, this.address, this.battery, this.firmware)
               console.log("[wss] device %s connected. FW:%s", msg.data.address, msg.data.firmwareVersion)
             }
             break;
@@ -176,10 +184,15 @@ const path = require('path')
               }
               let addr = (addressCounter < 10) ? (addressCounter+ " ") : addressCounter    // align MACs for debug
               console.log("[wss] address: %s    sent to: %s", addr, msg.data)
-              addressCounter++;
+              this.address = addressCounter     // 'this' is _ws ... aka device that sent the message
+              addressCounter++
               if (wss.clients.size == addressCounter) {
                 console.log("[wss] addressing complete (%s devices)", addressCounter)
                 remoteStatusConsole('print-message', "addressing " + addressCounter + " device(s) complete")
+                // update monitor after scanning addresses:
+                wss.clients.forEach((_ws) => {
+                  updateMonitor(_ws.isAlive, _ws.address, _ws.battery, _ws.firmware)
+                })
               }
               this.send(JSON.stringify(response))
             }
@@ -249,9 +262,22 @@ const path = require('path')
     openDeviceMonitor()
   })
 
+  ipcMain.on('monitorRefresh', (event) => {
+    // update monitor after scanning addresses:
+    wss.clients.forEach((_ws) => {
+      updateMonitor(_ws.isAlive, _ws.address, _ws.battery, _ws.firmware)
+    })
+  })
+
   function remoteStatusConsole(msg, data) {
-    win.send(msg, data)
+    if (win) win.send(msg, data)
   }
+
+  function updateMonitor(conn, addr, batt, fw) {
+    //let arg = [addr, batt, fw]
+    if (mon) mon.send('update-spores', conn, addr, batt, fw)
+  }
+
 
 
 /* --------- OSC MESSAGING --------- */

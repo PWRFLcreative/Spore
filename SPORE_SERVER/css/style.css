@@ -34,6 +34,15 @@ button {
   cursor: pointer;
   background-color:#EEE;
 }
+button:focus {
+  outline-color: rgba(254, 115, 106, 0.83); 
+}
+#monitorRefreshButton {
+  position:absolute;
+  right: 10px;
+  top: 20px;
+  display:inline;
+}
 
 #status-console {
   border: 1px solid #333;
@@ -49,23 +58,38 @@ button {
 }
 
 .spore {
+  padding: 1px 0;
   font-size: 0.5em;
   display: inline-block;
   width: 40px;  /* 96 */
   height: 40px; /* 64 */
   margin: 0;
-  background-color: rgb(200, 200, 200);
+  /*background-color: rgb(200, 200, 200);*/
+  background-color: #EEE;
+  outline: 1px dashed grey;
 }
 
 .address {
-  padding: 3px;
+  padding: 2px 0;
   display: block;
 }
 
 .battery {
+  padding: 2px 0;
   display: block;
 }
 
 .firmware {
+  padding: 2px 0;
   display: block;
+}
+
+.connected {
+  background-color: rgba(255, 255, 130, 1.0);
+  /*background-color: rgba(37, 110, 255, 1.0);*/
+  outline: 1px solid grey;
+}
+
+.focused {
+  background-color: rgba(254, 115, 106, 0.83);
 }
