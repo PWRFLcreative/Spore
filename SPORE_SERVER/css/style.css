@@ -35,7 +35,7 @@ button {
   background-color:#EEE;
 }
 button:focus {
-  outline-color: rgba(254, 115, 106, 0.83); 
+  outline-color: rgba(254, 115, 106, 0.83);
 }
 #monitorRefreshButton {
   position:absolute;
@@ -64,6 +64,7 @@ button:focus {
   width: 40px;  /* 96 */
   height: 40px; /* 64 */
   margin: 0;
+  cursor: pointer;
   /*background-color: rgb(200, 200, 200);*/
   background-color: #EEE;
   outline: 1px dashed grey;
@@ -85,11 +86,23 @@ button:focus {
 }
 
 .connected {
-  background-color: rgba(255, 255, 130, 1.0);
+  background-color: rgba(254, 115, 106, 0.83);
   /*background-color: rgba(37, 110, 255, 1.0);*/
   outline: 1px solid grey;
 }
 
 .focused {
-  background-color: rgba(254, 115, 106, 0.83);
+  outline: 2px solid rgba(255, 255, 130, 1.0);
+  animation: pulse 3s infinite;
+}
+@keyframes pulse {
+  0% {
+    background-color: rgba(255, 255, 130, 0.8);
+  }
+  50% {
+    background-color: white;
+  }
+  100% {
+    background-color: rgba(255, 255, 130, 0.8);
+  }
 }

@@ -58,8 +58,8 @@ let addressCounter = 0
     // render process:
     win = new BrowserWindow({width: 600, height: 600, x: 50, y: 100, show: false})
     win.loadFile('index.html')
-
     win.once('ready-to-show', () => {
+      win.send('firmware-version', config.firmware_version)
       win.show()
     })
 
@@ -288,8 +288,10 @@ function sendServerIP() {
   //console.log("[osc] my ip: " + buf[0] + "." + buf[1] + "." + buf[2] + "." + buf[3])
   const message = new OSC.Message('/server', buf[0], buf[1], buf[2], buf[3])
   const binary = message.pack()
-  socket.send(new Buffer(binary), 0, binary.byteLength, config.osc_port, config.osc_host)
-  console.log("[osc] osc sending my IP (" + ip.address() + ") to " + config.osc_host + ":" + config.osc_port)
+  //socket.send(new Buffer(binary), 0, binary.byteLength, config.osc_port, config.osc_host)
+  socket.send(new Buffer(binary), 0, binary.byteLength, config.osc_port, ip.or(ip.address(), '0.0.0.255'))
+  //console.log("[osc] osc sending my IP (" + ip.address() + ") to " + config.osc_host + ":" + config.osc_port)
+  console.log("[osc] osc sending my IP (" + ip.address() + ") to " + ip.or(ip.address(), '0.0.0.255') + ":" + config.osc_port)
 }
 
 
