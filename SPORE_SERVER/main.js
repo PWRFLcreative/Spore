@@ -51,6 +51,7 @@ function createWindow() {
     win.on('closed', () => {
         win = null
     })
+    win.setMenu(null) //Hide window menu
 }
 app.on('ready', createWindow)
     // macOS close window but not app:
