@@ -43,3 +43,29 @@ button {
   text-overflow:clip;
   overflow-y:scroll;
 }
+
+#spore-template {
+  display: none;
+}
+
+.spore {
+  font-size: 0.5em;
+  display: inline-block;
+  width: 40px;  /* 96 */
+  height: 40px; /* 64 */
+  margin: 0;
+  background-color: rgb(200, 200, 200);
+}
+
+.address {
+  padding: 3px;
+  display: block;
+}
+
+.battery {
+  display: block;
+}
+
+.firmware {
+  display: block;
+}
