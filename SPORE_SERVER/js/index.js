@@ -1,4 +1,6 @@
+const BrowserWindow = require('electron').remote.BrowserWindow
 const {ipcRenderer} = require('electron')
+const ip = require('ip')
 
 let status_console = document.getElementById('status-console')
 let button_fw      = document.getElementById('checkFirmwareButton')
@@ -7,11 +9,18 @@ let button_scan    = document.getElementById('scanButton')
 let button_mode0   = document.getElementById('modeButton0')
 let button_mode1   = document.getElementById('modeButton1')
 let button_mode2   = document.getElementById('modeButton2')
+let button_monitor = document.getElementById('openMonitorButton')
 
 
 
 window.onload = () => {
   statusConsole("ready and waiting with bated breath")
+}
+
+
+function openDeviceMonitor() {
+  ipcRenderer.send('openDeviceMonitor')
+  statusConsole("opening monitor")
 }
 
 
@@ -32,7 +41,7 @@ function checkFirmware() {
 
 function sendServerIP() {
   ipcRenderer.send('sendServerIP')
-  statusConsole("sending my IP (" + location.host + ") to the spores")
+  statusConsole("sending my IP (" + ip.address() + ") to the spores")
 }
 
 function scanDevices() {
@@ -44,7 +53,6 @@ function setMode(arg) {
   ipcRenderer.send('setMode', arg)
   statusConsole("set mode to: " + arg)
 }
-
 
 
 /* -------- MESSAGING (main <--> render processes) -------- */
@@ -64,6 +72,7 @@ ipcRenderer.on('print-message', (event, arg) => {
 button_fw.addEventListener('click', checkFirmware)    // maybe try dblclick!
 button_scan.addEventListener('click', scanDevices)
 button_sendip.addEventListener('click', sendServerIP)
+button_monitor.addEventListener('click', openDeviceMonitor)
 button_mode0.addEventListener('click', () => {setMode(0)})
 button_mode1.addEventListener('click', () => {setMode(1)})
 button_mode2.addEventListener('click', () => {setMode(2)})

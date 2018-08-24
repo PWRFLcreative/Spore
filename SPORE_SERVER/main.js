@@ -41,9 +41,9 @@ const MSG_TYPE_SCAN             = 5
 const MSG_TYPE_REQUEST_ADDRESS  = 6
 const MSG_TYPE_CONNECT_INFO     = 7
 
-let win = null
+let win = null            // main windows
+let mon = null            // monitor window
 let addressCounter = 0
-let addressScanning = false
 
 
 /* -------- ELECTRON-RELOAD (monitor file changes and restart): ---------- */
@@ -60,14 +60,39 @@ let addressScanning = false
 /* --------- ELECTRON --------- */
   function createWindow() {
     // render process:
-    win = new BrowserWindow({width: 800, height: 600})
+    win = new BrowserWindow({width: 600, height: 600, show: false})
     win.loadFile('index.html')
+
+    win.once('ready-to-show', () => {
+      win.show()
+    })
 
     win.on('closed', () => {
       win = null
     })
 
     sendServerIP()    // broadcast OSC message w/ server IP to all devices
+  }
+
+  function openDeviceMonitor() {
+    if (!mon) {
+      console.log("[main] opening new monitor window")
+      mon = new BrowserWindow({ width: 400, height: 600, show: false })
+      mon.loadFile('monitor.html')
+      //let _pos = mon.getPosition()
+      mon.setPosition(win.getPosition()[0]+win.getSize()[0], win.getPosition()[1])
+
+      mon.once('ready-to-show', () => {
+        mon.show()
+      })
+      mon.on('close', () => {
+        mon = null
+      })
+    }
+    else {
+      mon.setPosition(win.getPosition()[0]+win.getSize()[0], win.getPosition()[1])
+      mon.focus()
+    }
   }
   app.on('ready', createWindow)
   // macOS close window but not app:
@@ -196,7 +221,6 @@ let addressScanning = false
 
   ipcMain.on('scanDevices', (event) => {
     // [ADDR] clear address array
-    addressScanning = true
     addressCounter = 0
     let msg = {
       type: MSG_TYPE_SCAN
@@ -219,6 +243,10 @@ let addressScanning = false
     sendServerIP()
   })
 
+  ipcMain.on('openDeviceMonitor', (event) => {
+    openDeviceMonitor()
+  })
+
   function remoteStatusConsole(msg, data) {
     win.send(msg, data)
   }
@@ -227,10 +255,13 @@ let addressScanning = false
 /* --------- OSC MESSAGING --------- */
 // using low level api of OSC lib allows us to send broadcast messages
 function sendServerIP() {
-  const message = new OSC.Message('/server', 10, 0, 1, 100)
+  let buf = Buffer.alloc(4)
+  ip.toBuffer(ip.address(), buf, 0)
+  //console.log("[osc] my ip: " + buf[0] + "." + buf[1] + "." + buf[2] + "." + buf[3])
+  const message = new OSC.Message('/server', buf[0], buf[1], buf[2], buf[3])
   const binary = message.pack()
   socket.send(new Buffer(binary), 0, binary.byteLength, config.osc_port, config.osc_host)
-  console.log("[osc] osc sending to " + config.osc_host + ":" + config.osc_port)
+  console.log("[osc] osc sending my IP (" + ip.address() + ") to " + config.osc_host + ":" + config.osc_port)
 }
 
 
