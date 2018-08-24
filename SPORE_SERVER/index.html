@@ -3,18 +3,22 @@
 
 <head>
     <title>SPORE Server</title>
-    <link rel="stylesheet" type="text/css" href="css/style.css"> </head>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <!--    Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto+Mono" rel="stylesheet">
+</head>
 
 <body>
-    <h1>SPORE Server</h1>
-    <button type="button" id="checkFirmwareButton">Check Firmware</button>
-    <button type="button" id="scanButton">Scan/Configure</button>
+    <div class="logo"><img src="img/SPORE-White.png" style="width:15%"></div>
+    <div class="center">
+        <button type="button" id="checkFirmwareButton">Update Firmware</button>
+        <button type="button" id="scanButton">Scan for Changes</button>
+    </div>
     <section style="position:fixed;bottom:10px;width:98%;left:50%;transform:translateX(-50%);">
-        <p style="margin-bottom:2px">System Status:</p>
+        <!--<p style="margin-bottom:2px">System Status:</p>-->
         <p id="status-console"></p>
     </section>
     <script src="js/index.js"></script>
 </body>
 
 </html>
-<!-- inconsolata + montserrat
