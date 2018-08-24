@@ -47,14 +47,16 @@ let addressCounter = 0
 
 
 /* -------- ELECTRON-RELOAD (monitor file changes and restart): ---------- */
-  const path = require('path')
-  // for some reason, __dirname isn't working here (using **/*.* instead):
-  require('electron-reload')('**/*.*', {
-    //electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
-    electron: path.join(__dirname, 'node_modules', 'electron'),
-    hardResetMethod: 'exit'
+const path = require('path')
+  // // for some reason, __dirname isn't working here (using **/*.* instead):
+  // require('electron-reload')('**/*.*', {
+  //   //electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
+  //   electron: path.join(__dirname, 'node_modules', 'electron'),
+  //   hardResetMethod: 'exit'
+  // })
+  require('electron-reload')(__dirname,{
+    electron: path.join(__dirname, 'node_modules','.bin', 'electron')
   })
-
 
 
 /* --------- ELECTRON --------- */
@@ -77,7 +79,7 @@ let addressCounter = 0
   function openDeviceMonitor() {
     if (!mon) {
       console.log("[main] opening new monitor window")
-      mon = new BrowserWindow({ width: 400, height: 600, show: false })
+      mon = new BrowserWindow({ width: 456, height: 600, show: false })
       mon.loadFile('monitor.html')
       //let _pos = mon.getPosition()
       mon.setPosition(win.getPosition()[0]+win.getSize()[0], win.getPosition()[1])
