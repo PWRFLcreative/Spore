@@ -27,11 +27,13 @@ IPAddress serverIP(10, 10, 10, 100);      // server IP address
 //IPAddress serverIP(10, 10, 10, 100);      // server IP address
 uint16_t wsPort      = 8080;              // websocket connection port
 
+uint16_t oscPort = 7777;
+
 
 /* -- firmware settings -- */
-#define HW_VERSION "0.0.3"
-#define HW_PHASE   "-beta"
-const int FW_VERSION = 201;              // 0.2.00, convention: 1.2.10 = 1210, 0.5.9 = 509, no leading 0s or it is interpreted as octal.. learned that the hard way!
+#define HW_VERSION "1.0.0"
+#define HW_PHASE   ""
+const int FW_VERSION = 202;              // 0.2.02, convention: 1.2.10 = 1210, 0.5.9 = 509, no leading 0s or it is interpreted as octal.. learned that the hard way!
 #define FW_PHASE   "-alpha"
 //float fwCheckButtonTime = 2000.0f;     // how long to hold button down.
 

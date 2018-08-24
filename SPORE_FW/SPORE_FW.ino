@@ -57,7 +57,7 @@ NeoGamma<NeoGammaTableMethod> colorGamma;                         // for any fad
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> pixels(PixelCount);  // This is DMA so uses GPIO 3 (alawys same physical pin as U0RXD)
 
 E131 e131;                              // sACN library
-
+WiFiUDP udp;
 
 
 
@@ -74,10 +74,10 @@ void setup() {
   EEPROM.begin(512);
   //EEPROM.get(0, address);
   address = EEPROM.read(0);
-  //address = WiFi.localIP()[3];              // get address
-  //address = 0;                                // TESTING - just set to 1 manually for now
-  //String macAddress = WiFi.macAddress();
   deviceName.concat(address);
+  for (int i = 0; i < 4; i++) {
+    serverIP[i] = EEPROM[i+1];    // + 1 because "address" is stored at 0
+  }
 
   /* LEDs */
   delay(100);
@@ -121,6 +121,14 @@ void setup() {
   webSocket.onEvent(webSocketEvent);
   webSocket.setReconnectInterval(5000);       // TODO: Do I need to manually ping/pong??
 
+  /* udp listen */
+  if (udp.begin(oscPort)) {
+    Serial.printf("Opened unicast OSC port\n");
+  }
+  else {
+    Serial.printf("Open OSC prt failed\n");
+  }
+
   /* who am I this time?  */
   delay(100);
   Serial.printf("\nConnection details:\n");
@@ -128,6 +136,7 @@ void setup() {
   Serial.println(WiFi.localIP());
   Serial.printf("sACN address: %u\n", address);
   Serial.printf("Listening to Websocket server at: %s:%u\n", serverIP.toString().c_str(), wsPort);
+  Serial.printf("Listening to unicast OSC at port: %u\n", oscPort);
   Serial.printf("%s (%s) ready. \n", deviceName.c_str(), WiFi.macAddress().c_str());
   Serial.printf("\n---\n\n");
 
@@ -147,7 +156,9 @@ void loop() {
     webSocket.sendPing();                       // ping server to recognize a dropped TCP connection
     pingTimer = millis();
   }
-  
+
+
+  /* sACN receive: */
   if (e131.parsePacket()) {
     /* NOTE: ADDRESSES SHOULD PROBABLY START AT 0 IF WE ARE NOT DERIVING THEM FROM OR ASSIGNING THEM TO IP ADDRESSES */
     uint8_t r = e131.data[address * CHAN_PER_FIXTURE];         // address starts at 0
@@ -161,6 +172,23 @@ void loop() {
   }
   pixels.Show();
 
+
+  /* OSC receive (for server config): */
+  //noInterrupts();
+  int udpSize = udp.parsePacket();
+  //interrupts();
+  if (udpSize > 0) {
+    OSCMessage inMsg;
+    while (udpSize--) {
+      inMsg.fill(udp.read());
+    }
+    if (!inMsg.hasError()) {
+      inMsg.route("/server", updateServerIP);
+    }
+  }
+
+
+  /* Handle OTA FIRMARE updates: */
   if (checkForFW) {
     checkForNewFirmware(fwUrlBase, fwFilename);
     checkForFW = false;

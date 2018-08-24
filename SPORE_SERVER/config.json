@@ -1,5 +1,7 @@
 {
   "websocket_port" : "8080",
+  "osc_port" : 7777,
+  "osc_host" : "10.0.1.255",
 
   "firmware_version" : "202",
   "firmware_filename" : "spore_fw",

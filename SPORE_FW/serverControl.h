@@ -8,9 +8,8 @@
 */
 
 #include <ArduinoJson.h>
-
 #include <Hash.h>
-
+#include "OSCMessage.h"
 
 
 
@@ -35,6 +34,31 @@ enum MsgType : uint8_t  {
   CONNECT_INFO
 };
 
+
+/* ---- OSC Callback: ---- */
+void updateServerIP(OSCMessage &msg, int addressOffset) {
+  for (int i = 0; i < 4; i++) {
+    if (msg.isInt(i)) {
+      serverIP[i] = msg.getInt(i);
+      bool _serverChanged = false;
+      if (serverIP[i] != EEPROM[i+1]) {
+        EEPROM[i+1] = serverIP[i];
+        _serverChanged = true;
+      }
+      if (_serverChanged) {
+        EEPROM.commit();
+        webSocket.begin(serverIP.toString(), wsPort, "/");
+        Serial.printf("[osc] New Websocket server at: %s:%u\n", serverIP.toString().c_str(), wsPort);
+      }
+      else {
+        Serial.printf("[osc] websocket server unchanged");
+      }
+    }
+  }
+}
+
+
+/* ---- websocket<-->JSON functions ---- */
 const uint16_t jsonSendSize = 256;
 void serializeJSON_connected(char * json) {
   StaticJsonBuffer<jsonSendSize> jsonBuffer;
@@ -56,8 +80,6 @@ void serializeJSON_scan(char * json) {
   Serial.println(json);
 }
 
-//TODO: periodically attempt to reconnect to server if down. Use websocket ping/pong?
-//      I think websocket library does this automagically
 bool deserializeJSON(uint8_t * json) {
   StaticJsonBuffer<512> jsonBuffer;     // actually only needs to be about 240 bytes, extra reserved for future use (or just because I have the space..). (http://arduinojson.org/assistant/)
   JsonObject& root = jsonBuffer.parseObject(json);

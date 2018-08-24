@@ -22,6 +22,14 @@ const wss = new WebSocket.Server({ port: config.websocket_port })
 const express = require('express')
 const fw = express()
 const ip = require('ip')
+const dgram = require('dgram')
+const OSC = require('osc-js')
+const socket = dgram.createSocket('udp4')
+
+socket.on('listening', function(){
+    socket.setBroadcast(true);
+})
+socket.bind(config.osc_port)
 
 
 const MSG_TYPE_SET_ADDRESS      = 0
@@ -58,6 +66,8 @@ let addressScanning = false
     win.on('closed', () => {
       win = null
     })
+
+    sendServerIP()    // broadcast OSC message w/ server IP to all devices
   }
   app.on('ready', createWindow)
   // macOS close window but not app:
@@ -83,6 +93,7 @@ let addressScanning = false
     _ws.isAlive = true
     _ws.on('pong', heartbeatWS)
     _ws.on('message', onMessageWS)
+    _ws.on('error', (err) => console.log('[_ws] error: ' + err));
   })
 
   function heartbeatWS() {
@@ -184,6 +195,7 @@ let addressScanning = false
   })
 
   ipcMain.on('scanDevices', (event) => {
+    sendServerIP()
     // [ADDR] clear address array
     addressScanning = true
     addressCounter = 0
@@ -207,6 +219,16 @@ let addressScanning = false
   function remoteStatusConsole(msg, data) {
     win.send(msg, data)
   }
+
+
+/* --------- OSC MESSAGING --------- */
+// using low level api of OSC lib allows us to send broadcast messages
+function sendServerIP() {
+  const message = new OSC.Message('/server', 10, 0, 1, 100)
+  const binary = message.pack()
+  socket.send(new Buffer(binary), 0, binary.byteLength, config.osc_port, config.osc_host)
+  console.log("[osc] osc sending to " + config.osc_host + ":" + config.osc_port)
+}
 
 
 
