@@ -204,6 +204,7 @@ let addressCounter = 0
               this.battery = msg.data
               updateMonitor(this.isAlive, this.address, this.battery, this.firmware)
             }
+            break;
 
           default:
             console.log("[wss] message type: %s", msg.type)

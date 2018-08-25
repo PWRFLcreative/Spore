@@ -12,6 +12,7 @@ function Spore(addr) {
   this.addr = addr
   this.focus = false
   this.connected = false
+  this.lowBatt = false
 
   this.el = document.getElementById("spore-template").cloneNode(true)
   this.el.setAttribute( "id", "spore-" + addr )
@@ -25,20 +26,28 @@ function Spore(addr) {
     this.el.querySelector( ".address" ).textContent = addr
     //console.log(addr)
   }
+
   this.onConnect = function() {
     this.connected = true
     this.el.classList.toggle("connected", this.connected)
     console.log("connect %s", this.addr)
   }
+
   this.onDisconnect = function() {
     this.connected = false
-    this.focus = false;
+    this.focus = false
+    this.lowBatt = false
     this.el.classList.toggle("focused", this.focus)
     this.el.classList.toggle("connected", this.connected)
+    this.el.classList.toggle("lowBatt", this.lowBatt)
+    this.el.querySelector( ".battery" ).textContent = '--'
+    this.el.querySelector( ".firmware" ).textContent = '--'
     // change appearance
   }
+
   this.batteryLevel = function(batt) {
     //this.battery = batt
+    this.lowBatt = false
     if (batt > 0) {
       this.battery = (batt-2.75)/1.45*100     // battery range 2.75 to 4.2
       //this.battery = batt
@@ -48,12 +57,17 @@ function Spore(addr) {
       this.battery = 0
       this.el.querySelector( ".battery" ).textContent = 'n/a'
     }
-
+    if (this.battery < 20) {
+      this.lowBatt = true
+    }
+    this.el.classList.toggle("lowBatt", this.lowBatt)
   }
+
   this.firmwareVersion = function(fw) {
     this.firmware = fw
     this.el.querySelector( ".firmware" ).textContent = fw
   }
+
   this.toggleFocus = function() {
     if (this.connected) {
       this.focus = !this.focus
@@ -106,8 +120,8 @@ ipcRenderer.on('update-spores', (event, conn, addr, batt, fw) => {
     }
     else {
       spores[addr].onDisconnect()
-      spores[addr].batteryLevel('--')
-      spores[addr].firmwareVersion('--')
+      // //spores[addr].batteryLevel(0)
+      // spores[addr].firmwareVersion('--')
     }
   }
 })
