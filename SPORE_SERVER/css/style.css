@@ -1,38 +1,77 @@
 /*chromium selection error workaround */
+
 ::selection {
-  /*background:rgba(255, 255, 125, 0.99);
+    /*background:rgba(255, 255, 125, 0.99);
   color:#032764;*/
-  background:rgba(254, 115, 106, 0.83);
-  color: #333333;
-}
-body, input, textarea, button {
-  color: #333333;
-  /*font-family: 'Montserrat-Regular';*/
-  font-family: 'Inconsolata-Regular';
+    background: rgba(254, 115, 106, 0.83);
+    color: #333333;
 }
 
-@font-face {
-  font-family: 'Inconsolata-Regular';
-  src: url('../fonts/Inconsolata-Regular.ttf');
-  font-family: 'Montserrat-Regular';
-  src: url('../fonts/Montserrat-Regular.ttf');
+body {
+    /*    background-image: linear-gradient(to top left, #303030, #020202);*/
+    background-image: url("file:///img/Spore-BG.png");
+    height: 100%;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: #b8b8b8;
+    font-family: 'Roboto Mono', monospace;
+}
+
+input,
+textarea {
+    color: #b8b8b8;
+    font-family: 'Roboto Mono', monospace;
+    /*    background-color: #222222;*/
+    /*    background-image: url("img/Spore-BG.png")*/
 }
 
 h1 {
-  font-family: 'Inconsolata-Regular';
+    font-family: 'Open Sans', sans-serif;
 }
+
 h2 {
-  font-family: 'Inconsolata-Regular';
+    font-family: 'Open Sans', sans-serif;
 }
 
 button {
-  width: 30%;
-  height: 30px;
-  font-size:0.8em;
-  margin: 1%;
-  border:none;
-  cursor: pointer;
-  background-color:#EEE;
+    width: 25%;
+    height: 40px;
+    font-size: 0.8em;
+    margin: 1%;
+    margin-top: 75px;
+    border: none;
+    cursor: pointer;
+    color: #2d2d2d;
+    background-color: #ececec;
+    border-radius: 5px;
+    font-family: 'Open Sans', sans-serif;
+    /*    hover transitions*/
+    -o-transition: .5s;
+    -ms-transition: .5s;
+    -moz-transition: .5s;
+    -webkit-transition: .5s;
+    transition: .5s;
+}
+
+button:hover {
+    background-color: #0bcbee;
+    color: #fff;
+    /*    filter: hue-rotate(-720deg);
+    */
+    -webkit-filter: none;
+    filter: none;
+    -webkit-animation: hue 3s infinite;
+    animation: hue 3s infinite;
+}
+
+@keyframes hue {
+    0% {
+        -webkit-filter: grayscale(0%) hue-rotate(0deg);
+    }
+    100% {
+        -webkit-filter: grayscale(0%) hue-rotate(360deg);
+    }
 }
 button:focus {
   outline-color: rgba(254, 115, 106, 0.83);
@@ -45,12 +84,20 @@ button:focus {
 }
 
 #status-console {
-  border: 1px solid #333;
-  margin:0;
-  padding:3px;
-  height:3em;
-  text-overflow:clip;
-  overflow-y:scroll;
+    margin: 0;
+    padding: 3px;
+    height: 3em;
+    margin: 5%;
+    text-overflow: clip;
+    overflow-y: scroll;
+}
+
+img {
+    width: 100px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
 }
 
 #spore-template {
@@ -110,4 +157,14 @@ button:focus {
   75% {
     background-color: white;
   }
+}
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+i {
+    margin-right: 10px;
 }

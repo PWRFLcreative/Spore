@@ -1,5 +1,14 @@
 const {ipcRenderer} = require('electron')
 const ip = require('ip')
+const tt = require('electron-tooltip')
+tt({
+    position: 'top',
+    width: 250,
+    style: {
+        backgroundColor: '#333333',
+        borderRadius: '4px'
+    }
+})
 
 let status_console = document.getElementById('status-console')
 let button_fw      = document.getElementById('checkFirmwareButton')
@@ -24,17 +33,17 @@ function openDeviceMonitor() {
 
 
 function clearStatusConsole() {
-  status_console.innerHTML = "&nbsp;"
+    status_console.innerHTML = "&nbsp;"
 }
 
 function statusConsole(msg) {
-  status_console.innerHTML += msg + "<br>"
-  status_console.scrollTop = status_console.scrollHeight
+    status_console.innerHTML += msg + "<br>"
+    status_console.scrollTop = status_console.scrollHeight
 }
 
 function checkFirmware() {
-  ipcRenderer.send('checkFirmware')
-  statusConsole("devices checking for new firmware..")
+    ipcRenderer.send('checkFirmware')
+    statusConsole("devices checking for new firmware..")
 }
 
 function sendServerIP() {
@@ -43,8 +52,8 @@ function sendServerIP() {
 }
 
 function scanDevices() {
-  ipcRenderer.send('scanDevices')
-  statusConsole("scanning devices (and configure addresses)..")
+    ipcRenderer.send('scanDevices')
+    statusConsole("scanning devices (and configure addresses)..")
 }
 
 function setMode(arg) {
@@ -55,7 +64,7 @@ function setMode(arg) {
 
 /* -------- MESSAGING (main <--> render processes) -------- */
 ipcRenderer.on('clear-status-console', (event) => {
-  clearStatusConsole()
+    clearStatusConsole()
 })
 ipcRenderer.on('devices-connected', (event, arg) => {
   statusConsole(arg + " device(s) connected")

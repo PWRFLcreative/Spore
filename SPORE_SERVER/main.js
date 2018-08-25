@@ -1,5 +1,4 @@
 // this file should create windows and handl all system events
-
 /*  try electron-reload to monitor changes:
     https://www.npmjs.com/package/electron-reload
 */
@@ -8,17 +7,17 @@
 // console.log(`Server will run at http://${host}:${port}`);
 // >> "Server will run at http://localhost:8080"
 // OR JSON.parse: https://stackoverflow.com/questions/5726729/how-to-parse-json-using-node-js
-
-
-const {app, BrowserWindow, ipcMain} = require('electron')
-
+const {
+    app, BrowserWindow, ipcMain
+} = require('electron')
 const fs = require('fs')
 let config = JSON.parse(fs.readFileSync('config.json'))
 console.log("[INFO] config:")
 console.log(config)
-
 const WebSocket = require('ws')
-const wss = new WebSocket.Server({ port: config.websocket_port })
+const wss = new WebSocket.Server({
+    port: config.websocket_port
+})
 const express = require('express')
 const fw = express()
 const ip = require('ip')
@@ -59,13 +58,15 @@ let addressCounter = 0
     // render process:
     win = new BrowserWindow({width: 600, height: 600, x: 50, y: 100, show: false})
     win.loadFile('index.html')
+    win.setMenu(null) //Hide window menu
+    
     win.once('ready-to-show', () => {
       win.send('firmware-version', config.firmware_version)
       win.show()
     })
 
     win.on('closed', () => {
-      win = null
+        win = null
     })
 
     sendServerIP()    // broadcast OSC message w/ server IP to all devices
@@ -102,15 +103,13 @@ let addressCounter = 0
   //   setTimeout(() => {app.quit()}, 1000)
   // })
 
-
-
-/* ------- WEBSOCKETS: -------- */
-  //https://www.npmjs.com/package/ws
-  //https://www.npmjs.com/package/ws#how-to-detect-and-close-broken-connections
+    /* ------- WEBSOCKETS: -------- */
+    //https://www.npmjs.com/package/ws
+    //https://www.npmjs.com/package/ws#how-to-detect-and-close-broken-connections
     // websocket terminal client:
     // > npm install -g wscat
     // > wscat -c <serverIP>:8080
-  wss.on('connection', (_ws, req) => {
+wss.on('connection', (_ws, req) => {
     let remoteIP = req.connection.remoteAddress
     console.log("[wss] %s connected", remoteIP)
     remoteStatusConsole('devices-connected', wss.clients.size)  // this might not be accurate (if a device reconnects it returns expected size +1)
@@ -125,10 +124,11 @@ let addressCounter = 0
     _ws.on('error', (err) => console.log('[_ws] error: ' + err));
   })
 
-  function heartbeatWS() {
-    this.isAlive = true       // 'this' refers to the device that sent the pong
-    //remoteStatusConsole('devices-connected', wss.clients.size)
-  }
+function heartbeatWS() {
+    this.isAlive = true // 'this' refers to the device that sent the pong
+        //remoteStatusConsole('devices-connected', wss.clients.size)
+}
+let prevClientsSize = 0
 
 
   let prevClientsSize = 0
@@ -144,11 +144,13 @@ let addressCounter = 0
     })
     //console.log("[wss] ping")
     if (wss.clients.size != prevClientsSize) {
-      remoteStatusConsole('devices-connected', wss.clients.size)
+        remoteStatusConsole('devices-connected', wss.clients.size)
     }
     prevClientsSize = wss.clients.size
-  }
-  setInterval(() => {pingWS()}, config.ping_interval)
+}
+setInterval(() => {
+    pingWS()
+}, config.ping_interval)
 
 
   function onMessageWS(_msg) {
@@ -215,22 +217,19 @@ let addressCounter = 0
         console.log("[wss] invalid message: no message type")
       }
     }
-  }
+}
 
 
   function broadcastWSS(msg) {
     wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(msg)
-      }
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(msg)
+        }
     })
-  }
-
-
-
+}
 /* -------- MESSAGING (main <--> render processes) -------- */
-  // ipcMain.on('channel', (event, arg) => {}
-  ipcMain.on('checkFirmware', (event) => {
+// ipcMain.on('channel', (event, arg) => {}
+ipcMain.on('checkFirmware', (event) => {
     let msg = {
       type: MSG_TYPE_CHECK_FIRMWARE,
       data: { version: config.firmware_version,
@@ -240,13 +239,12 @@ let addressCounter = 0
     }
     broadcastWSS(JSON.stringify( msg ))
     console.log("[ipc] check Firmware")
-  })
-
-  ipcMain.on('scanDevices', (event) => {
+})
+ipcMain.on('scanDevices', (event) => {
     // [ADDR] clear address array
     addressCounter = 0
     let msg = {
-      type: MSG_TYPE_SCAN
+        type: MSG_TYPE_SCAN
     }
     broadcastWSS(JSON.stringify(msg))
     console.log("[ipc] scanning %s devices", wss.clients.size)
@@ -305,11 +303,9 @@ function sendServerIP() {
 
 
 /* --------- FIRMWARE (EXPRESS SERVER): --------- */
-  // maybe switch this to ES6 import/export (do I need babel?) and put in another file.
-  // for now get the same styling as root index:
-  fw.use('/fonts', express.static('fonts'))
-  fw.use('/css', express.static('css'))
-  fw.use(express.static('firmware'))
-  fw.listen(config.firmware_server_port, () =>
-    console.log('[fw] firmware server listening at ' + ip.address() + ":" + config.firmware_server_port
-  ))
+// maybe switch this to ES6 import/export (do I need babel?) and put in another file.
+// for now get the same styling as root index:
+fw.use('/fonts', express.static('fonts'))
+fw.use('/css', express.static('css'))
+fw.use(express.static('firmware'))
+fw.listen(config.firmware_server_port, () => console.log('[fw] firmware server listening at ' + ip.address() + ":" + config.firmware_server_port))
