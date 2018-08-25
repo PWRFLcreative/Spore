@@ -30,7 +30,7 @@ uint16_t oscPort = 7777;                  // osc listen port to receive server c
 /* -- firmware settings -- */
 #define HW_VERSION "1.0.0"
 #define HW_PHASE   ""
-const int FW_VERSION = 204;              // 0.2.02, convention: 1.2.10 = 1210, 0.5.9 = 509, no leading 0s or it is interpreted as octal.. learned that the hard way!
+const int FW_VERSION = 206;              // 0.2.02, convention: 1.2.10 = 1210, 0.5.9 = 509, no leading 0s or it is interpreted as octal.. learned that the hard way!
 #define FW_PHASE   "-alpha"
 //float fwCheckButtonTime = 2000.0f;     // how long to hold button down.
 
@@ -43,8 +43,8 @@ const uint32_t pingInterval = 5000;
 
 enum Mode : uint8_t {
   NORMAL = 0,
-  TEST = 99,
-  SLEEP = 255
+  TEST = 1,
+  SLEEP = 2
 }currentMode;
 
 

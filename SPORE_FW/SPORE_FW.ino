@@ -39,6 +39,7 @@ extern "C" {
 #include "serverControl.h"
 //#include "FS.h"                       // File System / SPIFFS
 #include <NeoPixelBus.h>
+#include <FastLED.h>
 //#include <ESP8266WiFiMulti.h>         // alternate to wifimanager - no portal but remembers multiple access points
 #include <E131.h>                       // sACN (e1.31) library
 
@@ -58,6 +59,16 @@ NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> pixels(PixelCount);  // This is DMA
 
 E131 e131;                              // sACN library
 WiFiUDP udp;
+
+
+/******** MISC *********/
+
+void fadeAll(int amt) {
+  for (int i = 0; i < PixelCount; i++) {
+    
+  }
+}
+
 
 
 
@@ -109,10 +120,7 @@ void setup() {
 
 
   /* sACN
-     The e131.begin() method creates
-     the UDP port and joins the
-     multicast group for you.
-  */
+     The e131.begin() method creates the UDP port and joins the multicast group for you. */
   Serial.printf("Starting sACN: ");
   e131.begin(E131_MULTICAST, 1, 1);           // (E131_UNICAST <or> E131_MULTICAST, universeNumber, number of universes)
 
@@ -140,7 +148,7 @@ void setup() {
   Serial.printf("%s (%s) ready. \n", deviceName.c_str(), WiFi.macAddress().c_str());
   Serial.printf("\n---\n\n");
 
-  currentMode = NORMAL;
+  currentMode = TEST;
   yield();
 }
 
@@ -158,19 +166,39 @@ void loop() {
   }
 
 
-  /* sACN receive: */
-  if (e131.parsePacket()) {
-    /* NOTE: ADDRESSES SHOULD PROBABLY START AT 0 IF WE ARE NOT DERIVING THEM FROM OR ASSIGNING THEM TO IP ADDRESSES */
-    uint8_t r = e131.data[address * CHAN_PER_FIXTURE];         // address starts at 0
-    uint8_t g = e131.data[address * CHAN_PER_FIXTURE + 1];
-    uint8_t b = e131.data[address * CHAN_PER_FIXTURE + 2];
-    RgbColor col = colorGamma.Correct(RgbColor(r, g, b));
-    for (int i = 0; i < PixelCount; i++) {
-      pixels.SetPixelColor(i, col);
-    }
-    digitalWrite(LED_BUILTIN, HIGH);            // (low is on)
+  switch(currentMode) {
+    case TEST:
+      static uint32_t testTimer;
+      static uint8_t stepper;
+      if (millis() - testTimer > 12) {
+        stepper++;
+        testTimer = millis();
+      }
+      for (int i = 0; i < PixelCount; i++) {
+        HsbColor col = HsbColor(0.6, 0.30, cubicwave8( stepper )/255.0f);      // pulse with a blink (as stepper rolls over)
+        pixels.SetPixelColor(i, col);
+      }
+      pixels.Show();
+      break;
+    
+    case NORMAL:    // for now these all do the same thing!
+    case SLEEP:
+    default:
+      /* sACN receive: */
+      if (e131.parsePacket()) {
+        /* NOTE: ADDRESSES SHOULD PROBABLY START AT 0 IF WE ARE NOT DERIVING THEM FROM OR ASSIGNING THEM TO IP ADDRESSES */
+        uint8_t r = e131.data[address * CHAN_PER_FIXTURE];         // address starts at 0
+        uint8_t g = e131.data[address * CHAN_PER_FIXTURE + 1];
+        uint8_t b = e131.data[address * CHAN_PER_FIXTURE + 2];
+        RgbColor col = colorGamma.Correct(RgbColor(r, g, b));
+        for (int i = 0; i < PixelCount; i++) {
+          pixels.SetPixelColor(i, col);
+        }
+        digitalWrite(LED_BUILTIN, HIGH);            // (low is on)
+      }
+      pixels.Show();
+      break; 
   }
-  pixels.Show();
 
 
   /* OSC receive (for server config): */
