@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'Roboto Mono';
+    src: local('Roboto Mono'), local('RobotoMono-Regular'),
+        url('hinted-RobotoMono-Regular.woff2') format('woff2'),
+        url('hinted-RobotoMono-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    src: local('Open Sans Regular'), local('OpenSans-Regular'),
+        url('hinted-OpenSans-Regular.woff2') format('woff2'),
+        url('hinted-OpenSans-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+

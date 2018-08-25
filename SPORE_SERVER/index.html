@@ -4,22 +4,26 @@
 <head>
     <title>SPORE Setup</title>
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="webfonts/fonts/stylesheet.css">
+    <link rel="stylesheet" type="text/css" href="css/all.css">
     <!--    Web fonts-->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto+Mono" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous"> </head>
+    <!--
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto+Mono" rel="stylesheet">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous"></head>
+-->
 
-<body>
-    <div class="logo"><img src="img/SPORE-White.png" style="width:15%"></div>
-    <div class="center">
-        <button type="button" id="scanButton" data-tooltip="Scan network for added or removed Spores"><i class="fas fa-broadcast-tower"></i>Scan for Changes</button>
-        <button type="button" id="checkFirmwareButton" data-tooltip="Compare Spore FW versions with firmware folder and update over wifi"><i class="fas fa-upload"></i>Update Firmware</button>
-        <button type="button" id="gridButton" data-tooltip="View status of connected Spores"><i class="fas fa-th"></i>Spore Status</button>
-    </div>
-    <section style="position:fixed;bottom:10px;width:98%;left:50%;transform:translateX(-50%);">
-        <!--<p style="margin-bottom:2px">System Status:</p>-->
-        <p id="status-console"></p>
-    </section>
-    <script src="js/index.js"></script>
-</body>
+    <body>
+        <div class="logo"><img src="img/SPORE-White.png" style="width:15%"></div>
+        <div class="center">
+            <button type="button" id="scanButton" data-tooltip="Scan network for added or removed Spores"><i class="fas fa-broadcast-tower"></i>Scan for Changes</button>
+            <button type="button" id="checkFirmwareButton" data-tooltip="Compare Spore FW versions with firmware folder and update over wifi"><i class="fas fa-upload"></i>Update Firmware</button>
+            <button type="button" id="gridButton" data-tooltip="View status of connected Spores"><i class="fas fa-th"></i>Spore Status</button>
+        </div>
+        <section style="position:fixed;bottom:10px;width:98%;left:50%;transform:translateX(-50%);">
+            <!--<p style="margin-bottom:2px">System Status:</p>-->
+            <p id="status-console"></p>
+        </section>
+        <script src="js/index.js"></script>
+    </body>
 
 </html>
