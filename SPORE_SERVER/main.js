@@ -7,17 +7,13 @@
 // console.log(`Server will run at http://${host}:${port}`);
 // >> "Server will run at http://localhost:8080"
 // OR JSON.parse: https://stackoverflow.com/questions/5726729/how-to-parse-json-using-node-js
-const {
-    app, BrowserWindow, ipcMain
-} = require('electron')
+const {app, BrowserWindow, ipcMain} = require('electron')
 const fs = require('fs')
-let config = JSON.parse(fs.readFileSync('config.json'))
+let config = JSON.parse( fs.readFileSync('config.json') )
 console.log("[INFO] config:")
 console.log(config)
 const WebSocket = require('ws')
-const wss = new WebSocket.Server({
-    port: config.websocket_port
-})
+const wss = new WebSocket.Server({ port: config.websocket_port })
 const express = require('express')
 const fw = express()
 const ip = require('ip')
@@ -25,9 +21,7 @@ const dgram = require('dgram')
 const OSC = require('osc-js')
 const socket = dgram.createSocket('udp4')
 
-socket.on('listening', function(){
-    socket.setBroadcast(true);
-})
+socket.on('listening', function(){ socket.setBroadcast(true) })
 socket.bind(config.osc_port)
 
 
@@ -59,7 +53,7 @@ let addressCounter = 0
     win = new BrowserWindow({width: 600, height: 600, x: 50, y: 100, show: false})
     win.loadFile('index.html')
     win.setMenu(null) //Hide window menu
-    
+
     win.once('ready-to-show', () => {
       win.send('firmware-version', config.firmware_version)
       win.show()
@@ -103,13 +97,13 @@ let addressCounter = 0
   //   setTimeout(() => {app.quit()}, 1000)
   // })
 
-    /* ------- WEBSOCKETS: -------- */
-    //https://www.npmjs.com/package/ws
-    //https://www.npmjs.com/package/ws#how-to-detect-and-close-broken-connections
-    // websocket terminal client:
-    // > npm install -g wscat
-    // > wscat -c <serverIP>:8080
-wss.on('connection', (_ws, req) => {
+/* ------- WEBSOCKETS: -------- */
+  //https://www.npmjs.com/package/ws
+  //https://www.npmjs.com/package/ws#how-to-detect-and-close-broken-connections
+  // websocket terminal client:
+  // > npm install -g wscat
+  // > wscat -c <serverIP>:8080
+  wss.on('connection', (_ws, req) => {
     let remoteIP = req.connection.remoteAddress
     console.log("[wss] %s connected", remoteIP)
     remoteStatusConsole('devices-connected', wss.clients.size)  // this might not be accurate (if a device reconnects it returns expected size +1)
@@ -124,12 +118,10 @@ wss.on('connection', (_ws, req) => {
     _ws.on('error', (err) => console.log('[_ws] error: ' + err));
   })
 
-function heartbeatWS() {
-    this.isAlive = true // 'this' refers to the device that sent the pong
-        //remoteStatusConsole('devices-connected', wss.clients.size)
-}
-let prevClientsSize = 0
-
+  function heartbeatWS() {
+      this.isAlive = true     // 'this' refers to the device that sent the pong
+      //remoteStatusConsole('devices-connected', wss.clients.size)
+  }
 
   let prevClientsSize = 0
   function pingWS() {
@@ -147,11 +139,9 @@ let prevClientsSize = 0
         remoteStatusConsole('devices-connected', wss.clients.size)
     }
     prevClientsSize = wss.clients.size
-}
-setInterval(() => {
-    pingWS()
-}, config.ping_interval)
+  }
 
+  setInterval(() => { pingWS() }, config.ping_interval)
 
   function onMessageWS(_msg) {
     let msg = 0;
@@ -217,8 +207,7 @@ setInterval(() => {
         console.log("[wss] invalid message: no message type")
       }
     }
-}
-
+  }
 
   function broadcastWSS(msg) {
     wss.clients.forEach((client) => {
@@ -226,21 +215,25 @@ setInterval(() => {
             client.send(msg)
         }
     })
-}
+  }
+
+
+
 /* -------- MESSAGING (main <--> render processes) -------- */
-// ipcMain.on('channel', (event, arg) => {}
-ipcMain.on('checkFirmware', (event) => {
-    let msg = {
-      type: MSG_TYPE_CHECK_FIRMWARE,
-      data: { version: config.firmware_version,
-              url: "http://" + ip.address() + ":" + config.firmware_server_port + "/",
-              filename: config.firmware_filename
-            }
-    }
-    broadcastWSS(JSON.stringify( msg ))
-    console.log("[ipc] check Firmware")
-})
-ipcMain.on('scanDevices', (event) => {
+  // ipcMain.on('channel', (event, arg) => {}
+  ipcMain.on('checkFirmware', (event) => {
+      let msg = {
+        type: MSG_TYPE_CHECK_FIRMWARE,
+        data: { version: config.firmware_version,
+                url: "http://" + ip.address() + ":" + config.firmware_server_port + "/",
+                filename: config.firmware_filename
+              }
+      }
+      broadcastWSS(JSON.stringify( msg ))
+      console.log("[ipc] check Firmware")
+  })
+
+  ipcMain.on('scanDevices', (event) => {
     // [ADDR] clear address array
     addressCounter = 0
     let msg = {
@@ -287,25 +280,25 @@ ipcMain.on('scanDevices', (event) => {
 
 
 /* --------- OSC MESSAGING --------- */
-// using low level api of OSC lib allows us to send broadcast messages
-function sendServerIP() {
-  let buf = Buffer.alloc(4)
-  ip.toBuffer(ip.address(), buf, 0)
-  //console.log("[osc] my ip: " + buf[0] + "." + buf[1] + "." + buf[2] + "." + buf[3])
-  const message = new OSC.Message('/server', buf[0], buf[1], buf[2], buf[3])
-  const binary = message.pack()
-  //socket.send(new Buffer(binary), 0, binary.byteLength, config.osc_port, config.osc_host)
-  socket.send(new Buffer(binary), 0, binary.byteLength, config.osc_port, ip.or(ip.address(), '0.0.0.255'))
-  //console.log("[osc] osc sending my IP (" + ip.address() + ") to " + config.osc_host + ":" + config.osc_port)
-  console.log("[osc] osc sending my IP (" + ip.address() + ") to " + ip.or(ip.address(), '0.0.0.255') + ":" + config.osc_port)
-}
+  // using low level api of OSC lib allows us to send broadcast messages
+  function sendServerIP() {
+    let buf = Buffer.alloc(4)
+    ip.toBuffer(ip.address(), buf, 0)
+    //console.log("[osc] my ip: " + buf[0] + "." + buf[1] + "." + buf[2] + "." + buf[3])
+    const message = new OSC.Message('/server', buf[0], buf[1], buf[2], buf[3])
+    const binary = message.pack()
+    //socket.send(new Buffer(binary), 0, binary.byteLength, config.osc_port, config.osc_host)
+    socket.send(new Buffer(binary), 0, binary.byteLength, config.osc_port, ip.or(ip.address(), '0.0.0.255'))
+    //console.log("[osc] osc sending my IP (" + ip.address() + ") to " + config.osc_host + ":" + config.osc_port)
+    console.log("[osc] osc sending my IP (" + ip.address() + ") to " + ip.or(ip.address(), '0.0.0.255') + ":" + config.osc_port)
+  }
 
 
 
 /* --------- FIRMWARE (EXPRESS SERVER): --------- */
-// maybe switch this to ES6 import/export (do I need babel?) and put in another file.
-// for now get the same styling as root index:
-fw.use('/fonts', express.static('fonts'))
-fw.use('/css', express.static('css'))
-fw.use(express.static('firmware'))
-fw.listen(config.firmware_server_port, () => console.log('[fw] firmware server listening at ' + ip.address() + ":" + config.firmware_server_port))
+  // maybe switch this to ES6 import/export (do I need babel?) and put in another file.
+  // for now get the same styling as root index:
+  fw.use('/fonts', express.static('fonts'))
+  fw.use('/css', express.static('css'))
+  fw.use(express.static('firmware'))
+  fw.listen(config.firmware_server_port, () => console.log('[fw] firmware server listening at ' + ip.address() + ":" + config.firmware_server_port))

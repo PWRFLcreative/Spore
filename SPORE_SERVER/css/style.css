@@ -9,7 +9,8 @@
 
 body {
     /*    background-image: linear-gradient(to top left, #303030, #020202);*/
-    background-image: url("file:///img/Spore-BG.png");
+    /*background-image: url("file:///img/Spore-BG.png");*/
+    background-image: url("../img/Spore-BG.png");
     height: 100%;
     margin: 0;
     background-repeat: no-repeat;
