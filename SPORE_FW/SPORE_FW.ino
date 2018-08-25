@@ -187,6 +187,23 @@ void loop() {
     }
   }
 
+  /* battery voltage: */
+  static float vRaw;
+  static uint32_t analogReadTimer;
+  if (millis() - analogReadTimer > 500) {       // 200 = 5 per second. can't analogRead too fast or wifi disconnects. 
+    vRaw = analogRead(A0);
+    vRaw = (vRaw / 1023.0f) * 5.31;             // 5.31 is the calibration value for the new voltage divider (range goes below 0) May vary with resistor tolerance..
+    delay(3);                                   // this delay HAS to be here. No Flickers! (Thanks to DMA)
+    float coef = 0.25;
+    batteryVoltage = vRaw * coef + (1.0f - coef) * batteryVoltage;
+
+    char battJSON[jsonSendSize];
+    serializeJSON_battery(battJSON);
+    webSocket.sendTXT(battJSON);        // send to server
+    analogReadTimer = millis();
+  }
+  
+
 
   /* Handle OTA FIRMARE updates: */
   if (checkForFW) {

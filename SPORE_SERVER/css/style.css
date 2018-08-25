@@ -93,16 +93,17 @@ button:focus {
 
 .focused {
   outline: 2px solid rgba(255, 255, 130, 1.0);
+  background-color: white;
   animation: pulse 3s infinite;
 }
 @keyframes pulse {
-  0% {
-    background-color: rgba(255, 255, 130, 0.8);
-  }
-  50% {
+  25% {
     background-color: white;
   }
-  100% {
+  50% {
     background-color: rgba(255, 255, 130, 0.8);
+  }
+  75% {
+    background-color: white;
   }
 }

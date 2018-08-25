@@ -38,8 +38,17 @@ function Spore(addr) {
     // change appearance
   }
   this.batteryLevel = function(batt) {
-    this.battery = batt
-    this.el.querySelector( ".battery" ).textContent = batt
+    //this.battery = batt
+    if (batt > 0) {
+      this.battery = (batt-2.75)/1.45*100     // battery range 2.75 to 4.2
+      //this.battery = batt
+      this.el.querySelector( ".battery" ).textContent = this.battery.toFixed(0) + '%'
+    }
+    else {
+      this.battery = 0
+      this.el.querySelector( ".battery" ).textContent = 'n/a'
+    }
+
   }
   this.firmwareVersion = function(fw) {
     this.firmware = fw

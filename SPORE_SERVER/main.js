@@ -40,6 +40,7 @@ const MSG_TYPE_REBOOT           = 4
 const MSG_TYPE_SCAN             = 5
 const MSG_TYPE_REQUEST_ADDRESS  = 6
 const MSG_TYPE_CONNECT_INFO     = 7
+const MSG_TYPE_BATTERY          = 8
 
 let win = null            // main windows
 let mon = null            // monitor window
@@ -197,6 +198,12 @@ let addressCounter = 0
               this.send(JSON.stringify(response))
             }
             break;
+
+          case MSG_TYPE_BATTERY:
+            if (msg.data != undefined) {
+              this.battery = msg.data
+              updateMonitor(this.isAlive, this.address, this.battery, this.firmware)
+            }
 
           default:
             console.log("[wss] message type: %s", msg.type)

@@ -22,6 +22,7 @@
 //const MSG_TYPE_SCAN             = 5
 //const MSG_TYPE_REQUEST_ADDRESS  = 6
 //const MSG_TYPE_CONNECT_INFO     = 7
+//const MSG_TYPE_BATTERY          = 8
 
 enum MsgType : uint8_t  {
   SET_ADDRESS = 0,
@@ -31,7 +32,8 @@ enum MsgType : uint8_t  {
   REBOOT,
   SCAN,
   REQUEST_ADDRESS,
-  CONNECT_INFO
+  CONNECT_INFO,
+  BATTERY
 };
 
 
@@ -76,6 +78,15 @@ void serializeJSON_scan(char * json) {
   JsonObject& root = jsonBuffer.createObject();
   root["type"] = (uint8_t)REQUEST_ADDRESS;
   root["data"] = WiFi.macAddress();
+  root.printTo(json, jsonSendSize);
+  Serial.println(json);
+}
+
+void serializeJSON_battery(char *json) {
+  StaticJsonBuffer<jsonSendSize> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+  root["type"] = (uint8_t)BATTERY;
+  root["data"] = batteryVoltage;
   root.printTo(json, jsonSendSize);
   Serial.println(json);
 }

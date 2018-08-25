@@ -23,17 +23,14 @@ const char* ssid     = WIFI_SSID;         // ssid from wifi_config.h
 const char* password = WIFI_PASSWORD;     // password from wifi_config.h
 String deviceName    = "Spore_";          // used for DHCP
 IPAddress serverIP(10, 10, 10, 100);      // server IP address
-//IPAddress serverIP(192, 168, 1, 65);        // server IP address
-//IPAddress serverIP(10, 10, 10, 100);      // server IP address
 uint16_t wsPort      = 8080;              // websocket connection port
-
-uint16_t oscPort = 7777;
+uint16_t oscPort = 7777;                  // osc listen port to receive server config broadcast
 
 
 /* -- firmware settings -- */
 #define HW_VERSION "1.0.0"
 #define HW_PHASE   ""
-const int FW_VERSION = 203;              // 0.2.02, convention: 1.2.10 = 1210, 0.5.9 = 509, no leading 0s or it is interpreted as octal.. learned that the hard way!
+const int FW_VERSION = 204;              // 0.2.02, convention: 1.2.10 = 1210, 0.5.9 = 509, no leading 0s or it is interpreted as octal.. learned that the hard way!
 #define FW_PHASE   "-alpha"
 //float fwCheckButtonTime = 2000.0f;     // how long to hold button down.
 
@@ -55,5 +52,7 @@ enum Mode : uint8_t {
 bool checkForFW = false;
 String fwUrlBase;
 String fwFilename;
+
+float batteryVoltage = 3.7;               // assume nominal voltage to start 
 
 #endif /* SETTINGS_H */
