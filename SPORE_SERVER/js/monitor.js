@@ -100,7 +100,9 @@ function initView() {
       spore.el.style.width = itemWidth + "px"
       spore.el.style.margin = itemSpacing + "px"
 
-      document.body.appendChild( spore.el )
+      let container = document.getElementById('spore-container')
+      container.appendChild( spore.el )
+      // document.body.appendChild( spore.el )
 
       // col += 1
       // if ( col == numPerRow ) {

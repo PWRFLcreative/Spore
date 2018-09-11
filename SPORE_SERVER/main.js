@@ -69,7 +69,7 @@ let addressCounter = 0
   function openDeviceMonitor() {
     if (!mon) {
       console.log("[main] opening new monitor window")
-      mon = new BrowserWindow({ width: 456, height: 600, show: false })
+      mon = new BrowserWindow({ width: 460, height: 600, show: false })
       mon.loadFile('monitor.html')
       //let _pos = mon.getPosition()
       mon.setPosition( win.getPosition()[0] + win.getSize()[0] + 25, win.getPosition()[1] )

@@ -10,6 +10,7 @@
 body {
     /*    background-image: linear-gradient(to top left, #303030, #020202);*/
     /*background-image: url("file:///img/Spore-BG.png");*/
+    background-color: black;
     background-image: url("../img/Spore-BG.png");
     height: 100%;
     margin: 0;
@@ -40,7 +41,7 @@ button {
     height: 40px;
     font-size: 0.8em;
     margin: 1%;
-    margin-top: 75px;
+    /*margin-top: 75px;*/
     border: none;
     cursor: pointer;
     color: #2d2d2d;
@@ -79,18 +80,18 @@ button:focus {
 }
 #monitorRefreshButton {
   position:absolute;
-  right: 10px;
-  top: 20px;
+  right: 8px;
+  top: 10px;
   display:inline;
 }
 
 #status-console {
     margin: 0;
     padding: 3px;
-    height: 3em;
-    margin: 5%;
+    height: 6em;
     text-overflow: clip;
     overflow-y: scroll;
+    1px solid rgba(100,100,100,0.3);
 }
 
 img {
@@ -103,6 +104,10 @@ img {
 
 #spore-template {
   display: none;
+}
+
+#spore-container {
+    margin: 10px;
 }
 
 .spore {
@@ -164,6 +169,7 @@ img {
     margin-left: auto;
     margin-right: auto;
     text-align: center;
+    margin-top:50px;
 }
 
 i {

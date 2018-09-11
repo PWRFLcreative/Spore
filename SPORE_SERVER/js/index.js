@@ -73,7 +73,7 @@ ipcRenderer.on('print-message', (event, arg) => {
   statusConsole(arg)
 })
 ipcRenderer.on('firmware-version', (event, arg) => {
-  button_fw.innerHTML += '(' + arg + ')'
+  button_fw.innerHTML += ' (' + arg + ')'
   console.log(arg)
 })
 
