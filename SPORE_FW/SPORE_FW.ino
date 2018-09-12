@@ -80,6 +80,7 @@ void fadeAll(uint8_t darkenBy) {
 void setup() {
   wifi_set_sleep_type(NONE_SLEEP_T);          // disable wifi sleep (added this when trying to fix analogRead issue.. is it still needed?)
   Serial.begin(115200);
+  delay(200);
   Serial.printf("\n\n\nSPORE\n");
   Serial.printf("FW: %u%s   ", FW_VERSION, FW_PHASE);
   Serial.printf("HW: %s%s\n", HW_VERSION, HW_PHASE);
@@ -186,12 +187,14 @@ void loop() {
       pixels.Show();
       break;
     }
-    case SLEEP:   // for now this is blackout!
+    case SLEEP: {   // for now this is blackout!
       RgbColor col = RgbColor(0, 0, 0);
         for (int i = 0; i < PixelCount; i++) {
           pixels.SetPixelColor(i, col);
         }
+      pixels.Show();
       break;
+    }
     case NORMAL:    // for now these all do the same thing!
     default:
       /* sACN receive: */

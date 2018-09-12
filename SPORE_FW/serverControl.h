@@ -35,7 +35,7 @@ enum MsgType : uint8_t  {
   CONNECT_INFO,
   BATTERY
 };
-uint8_t testStepper = 0;      // for the test fade cycle
+volatile uint8_t testStepper = 0;      // for the test fade cycle
 
 
 /* ---- OSC Callback: ---- */
@@ -54,6 +54,9 @@ void updateServerIP(OSCMessage &msg, int addressOffset) {
     EEPROM.commit();
     webSocket.begin(serverIP.toString(), wsPort, "/");
     Serial.printf("[osc] New Websocket server at: %s:%u\n", serverIP.toString().c_str(), wsPort);
+    //delay(10);
+    yield();
+    ESP.restart();
   }
   else {
     Serial.printf("[osc] websocket server unchanged\n");
@@ -89,7 +92,7 @@ void serializeJSON_battery(char *json) {
   root["type"] = (uint8_t)BATTERY;
   root["data"] = batteryVoltage;
   root.printTo(json, jsonSendSize);
-  Serial.println(json);
+  //Serial.println(json);
 }
 
 bool deserializeJSON(uint8_t * json) {
@@ -124,11 +127,11 @@ bool deserializeJSON(uint8_t * json) {
               break;
             case TEST: {
                 testStepper = 0;
-                Serial.printf("NORMAL\n");
+                Serial.printf("TEST\n");
               }
               break;
             case SLEEP: {
-                Serial.printf("NORMAL\n");
+                Serial.printf("SLEEP\n");
               }
             break;
             default:
