@@ -35,6 +35,7 @@ enum MsgType : uint8_t  {
   CONNECT_INFO,
   BATTERY
 };
+uint8_t testStepper = 0;      // for the test fade cycle
 
 
 /* ---- OSC Callback: ---- */
@@ -122,6 +123,7 @@ bool deserializeJSON(uint8_t * json) {
               }
               break;
             case TEST: {
+                testStepper = 0;
                 Serial.printf("NORMAL\n");
               }
               break;

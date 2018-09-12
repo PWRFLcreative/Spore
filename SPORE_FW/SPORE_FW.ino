@@ -63,10 +63,13 @@ WiFiUDP udp;
 
 /******** MISC *********/
 
-void fadeAll(int amt) {
-  for (int i = 0; i < PixelCount; i++) {
-    
-  }
+void fadeAll(uint8_t darkenBy) {
+    RgbColor col;
+    for (uint16_t i = 0; i < pixels.PixelCount(); i++) {
+        col = pixels.GetPixelColor(i);
+        col.Darken(darkenBy);
+        pixels.SetPixelColor(i, col);
+    }
 }
 
 
@@ -101,7 +104,7 @@ void setup() {
   /* connect to WiFi */
   Serial.printf("[INFO] Connecting to: ");
   Serial.print(ssid);
-  //WiFi.persistent(false);                   // don't re-write ssid/password to flash every time (avoid degredation)
+  WiFi.persistent(false);                   // don't re-write ssid/password to flash every time (avoid degredation)
   WiFi.mode(WIFI_STA);                        // without this ESP will be station and AP at the same time - this can give you headaches!!!
   WiFi.hostname(deviceName);                  // DHCP Hostname    -- does this even work?!
   //WiFi.config(staticIP, gateway, subnet);   // set static IP, defaults to DHCP if config not called
@@ -167,25 +170,37 @@ void loop() {
 
 
   switch(currentMode) {
-    case TEST:
+    case TEST: {
       static uint32_t testTimer;
-      static uint8_t stepper;
       if (millis() - testTimer > 12) {
-        stepper++;
+        testStepper++;
         testTimer = millis();
+        pixels.RotateLeft(1);
       }
+      uint8_t _step = testStepper;
       for (int i = 0; i < PixelCount; i++) {
-        HsbColor col = HsbColor(0.6, 0.30, cubicwave8( stepper )/255.0f);      // pulse with a blink (as stepper rolls over)
+        HsbColor col = HsbColor(0.6, 0.30, cubicwave8( _step+i*5 )/255.0f);      // pulse with a blink (as testStepper rolls over)
         pixels.SetPixelColor(i, col);
       }
+      
       pixels.Show();
       break;
-    
+    }
     case NORMAL:    // for now these all do the same thing!
     case SLEEP:
     default:
       /* sACN receive: */
+      static uint32_t receiveTimer;
+      static uint32_t fadeTimer;
+      if (millis() - receiveTimer > receiveTimeout) {       // if we havent received a packet for <receiveTimeout>ms, then fade to black
+        if (millis() - fadeTimer > 6) {                     // 5 is the fade speed - lower number ot fade out faster
+          fadeAll(1);
+          fadeTimer = millis(); 
+        }
+      }
+      
       if (e131.parsePacket()) {
+        receiveTimer = millis();
         /* NOTE: ADDRESSES SHOULD PROBABLY START AT 0 IF WE ARE NOT DERIVING THEM FROM OR ASSIGNING THEM TO IP ADDRESSES */
         uint8_t r = e131.data[address * CHAN_PER_FIXTURE];         // address starts at 0
         uint8_t g = e131.data[address * CHAN_PER_FIXTURE + 1];
@@ -218,7 +233,7 @@ void loop() {
   /* battery voltage: */
   static float vRaw;
   static uint32_t analogReadTimer;
-  if (millis() - analogReadTimer > 500) {       // 200 = 5 per second. can't analogRead too fast or wifi disconnects. 
+  if (millis() - analogReadTimer > 1000) {       // 200 = 5 per second. can't analogRead too fast or wifi disconnects. 
     vRaw = analogRead(A0);
     vRaw = (vRaw / 1023.0f) * 5.31;             // 5.31 is the calibration value for the new voltage divider (range goes below 0) May vary with resistor tolerance..
     delay(3);                                   // this delay HAS to be here. No Flickers! (Thanks to DMA)

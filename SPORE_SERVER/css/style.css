@@ -146,18 +146,18 @@ img {
 }
 .focused {
   outline: 2px solid white;
-  background-color: lightyellow;
+  background-color: RGB(195, 225, 255);
   animation: pulse 2.5s infinite;
 }
 @keyframes pulse {
   20% {
-    background-color: lightyellow;
+    background-color: RGB(195, 225, 255);
   }
   50% {
-    background-color: yellow;
+    background-color: dodgerblue;
   }
   80% {
-    background-color: lightyellow;
+    background-color: RGB(195, 225, 255);
   }
 }
 
