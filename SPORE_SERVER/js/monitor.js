@@ -104,6 +104,7 @@ function Spore(addr) {
     if (this.connected) {
       this.focus = !this.focus
       this.el.classList.toggle("focused", this.focus)
+      sendFocusState(this.addr, this.focus)
       console.log("%s %s", this.el.id, this.focus)
     }
   }
@@ -162,6 +163,10 @@ ipcRenderer.on('update-spores', (event, conn, addr, batt, fw) => {
 
 function monitorRefresh() {
   ipcRenderer.send('monitorRefresh')
+}
+
+function sendFocusState(id, state) {
+  ipcRenderer.send('focusState', id, state)
 }
 
 button_refresh.addEventListener('click', monitorRefresh)

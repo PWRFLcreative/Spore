@@ -3,6 +3,7 @@
 ::selection {
     /*background:rgba(255, 255, 125, 0.99);
   color:#032764;*/
+    /* TODO: this is ugly change it */
     background: rgba(254, 115, 106, 0.83);
     color: #333333;
 }

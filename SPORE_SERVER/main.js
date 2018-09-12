@@ -268,6 +268,22 @@ let addressCounter = 0
     })
   })
 
+  ipcMain.on('focusState', (event, id, state) => {
+    let arg = null
+    if (state) arg = 1      // test mode
+    else arg = 0            // regular mode
+    let msg = {
+      type: MSG_TYPE_SET_MODE,
+      data: arg
+    }
+    wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN && client.address == id) {
+            client.send(JSON.stringify(msg))
+        }
+    })
+    console.log("[ipc] focusState: " + id + "=>" + state)
+  })
+
   function remoteStatusConsole(msg, data) {
     if (win) win.send(msg, data)
   }
