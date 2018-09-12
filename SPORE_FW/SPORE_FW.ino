@@ -186,8 +186,13 @@ void loop() {
       pixels.Show();
       break;
     }
+    case SLEEP:   // for now this is blackout!
+      RgbColor col = RgbColor(0, 0, 0);
+        for (int i = 0; i < PixelCount; i++) {
+          pixels.SetPixelColor(i, col);
+        }
+      break;
     case NORMAL:    // for now these all do the same thing!
-    case SLEEP:
     default:
       /* sACN receive: */
       static uint32_t receiveTimer;

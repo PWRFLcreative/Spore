@@ -2,7 +2,7 @@
   "websocket_port" : "8080",
   "osc_port" : 7777,
 
-  "firmware_version" : "209",
+  "firmware_version" : "210",
   "firmware_filename" : "spore_fw",
   "firmware_server_port" : "8888",
 
