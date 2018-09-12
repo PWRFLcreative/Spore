@@ -63,8 +63,8 @@ button:hover {
     */
     -webkit-filter: none;
     filter: none;
-    -webkit-animation: hue 3s infinite;
-    animation: hue 3s infinite;
+    /* -webkit-animation: hue 3s infinite;
+    animation: hue 3s infinite; */
 }
 
 @keyframes hue {
@@ -75,9 +75,11 @@ button:hover {
         -webkit-filter: grayscale(0%) hue-rotate(360deg);
     }
 }
+
 button:focus {
   outline-color: rgba(254, 115, 106, 0.83);
 }
+
 #monitorRefreshButton {
   position:absolute;
   right: 8px;
@@ -105,11 +107,9 @@ img {
 #spore-template {
   display: none;
 }
-
 #spore-container {
     margin: 10px;
 }
-
 .spore {
   padding: 1px 0;
   font-size: 0.5em;
@@ -118,52 +118,48 @@ img {
   height: 40px; /* 64 */
   margin: 0;
   /*background-color: rgb(200, 200, 200);*/
-  background-color: #EEE;
+  background-color: dimgrey;
   outline: 1px dashed grey;
 }
-
 .address {
   padding: 2px 0;
   display: block;
 }
-
 .battery {
   padding: 2px 0;
   display: block;
 }
-
 .firmware {
   padding: 2px 0;
   display: block;
 }
-
 .connected {
   /*background-color: rgba(254, 115, 106, 0.83);*/
   background-color: lawngreen;
   outline: 1px solid grey;
   cursor: pointer;
+  color: black;
 }
-
 .lowBatt {
   outline: 2px solid crimson;
 }
-
 .focused {
-  outline: 2px solid yellow;
-  background-color: white;
-  animation: pulse 3s infinite;
+  outline: 2px solid white;
+  background-color: lightyellow;
+  animation: pulse 2.5s infinite;
 }
 @keyframes pulse {
-  25% {
-    background-color: white;
+  20% {
+    background-color: lightyellow;
   }
   50% {
     background-color: yellow;
   }
-  75% {
-    background-color: white;
+  80% {
+    background-color: lightyellow;
   }
 }
+
 .center {
     display: block;
     margin-left: auto;

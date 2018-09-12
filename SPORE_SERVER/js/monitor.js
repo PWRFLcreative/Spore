@@ -48,24 +48,56 @@ function Spore(addr) {
   this.batteryLevel = function(batt) {
     //this.battery = batt
     this.lowBatt = false
+
     if (batt > 0) {
-      this.battery = (batt-2.75)/1.45*100     // battery range 2.75 to 4.2
+      this.battery = (batt-2.75)/1.45*100     // convert to % (battery range 2.75 to 4.2)
+      let battIcon = 'fa-battery-full'
+      if (this.battery < 75) {
+        battIcon = 'fa-battery-three-quarters'
+        if (this.battery < 50) {
+          battIcon = 'fa-battery-half'
+          if (this.battery < 25) {
+            battIcon = 'fa-battery-quarter'
+            if (this.battery < 20) {
+              battIcon = 'fa-battery-empty'
+              this.lowBatt = true
+            }
+          }
+        }
+      }
       //this.battery = batt
-      this.el.querySelector( ".battery" ).textContent = this.battery.toFixed(0) + '%'
+      this.el.classList.toggle("lowBatt", this.lowBatt)
+      this.el.querySelector( ".battery" ).innerHTML = '<span style="font-size:1.0em" class="fas ' + battIcon + '"></span> ' + this.battery.toFixed(0) + '%'
     }
     else {
       this.battery = 0
-      this.el.querySelector( ".battery" ).textContent = 'n/a'
+      this.el.querySelector( ".battery" ).textContent = '<span class="fas fa-battery-slash"></span>'
     }
-    if (this.battery < 20) {
-      this.lowBatt = true
-    }
-    this.el.classList.toggle("lowBatt", this.lowBatt)
   }
 
   this.firmwareVersion = function(fw) {
     this.firmware = fw
-    this.el.querySelector( ".firmware" ).textContent = fw
+    // let fw_formatted = fw
+    // if (fw < 1000) {
+    //   fw_formatted = 0 + '.' + Math.floor(fw/100%10) + '.'
+    // }
+    // else {
+    //   fw_formatted = Math.floor(fw/1000%10) + '.' + Math.floor(fw/100%10) + '.'
+    // }
+    // if (fw%100 < 10) {
+    //   fw_formatted += '0' + fw%100
+    // }
+    // else {
+    //   fw_formatted += fw%100
+    // }
+    let _fw = fw.toString()
+    if (fw < 1000) {  // 0.x.xx
+        _fw = 0 + '.' + _fw.charAt(0) + '.' + _fw.charAt(1) + _fw.charAt(2)
+    }
+    else {            // x.x.xx
+        _fw = _fw.charAt(0) + '.' + _fw.charAt(1) + '.' + _fw.charAt(2) + _fw.charAt(3)
+    }
+    this.el.querySelector( ".firmware" ).textContent = _fw
   }
 
   this.toggleFocus = function() {
