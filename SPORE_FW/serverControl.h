@@ -189,6 +189,7 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
       Serial.printf("[WSe] ERROR!\n");
       break;
     case WStype_DISCONNECTED:
+      currentMode = NORMAL;
       Serial.printf("[WSe] Disconnected!\n");
       break;
     case WStype_CONNECTED: {
