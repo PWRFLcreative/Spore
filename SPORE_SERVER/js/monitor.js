@@ -71,7 +71,7 @@ function Spore(addr) {
     }
     else {
       this.battery = 0
-      this.el.querySelector( ".battery" ).textContent = '<span class="fas fa-battery-slash"></span>'
+      this.el.querySelector( ".battery" ).innerHTML = '<span class="fas fa-battery-slash"></span>'
     }
   }
 
