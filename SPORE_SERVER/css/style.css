@@ -136,7 +136,7 @@ img {
 }
 .connected {
   /*background-color: rgba(254, 115, 106, 0.83);*/
-  background-color: lawngreen;
+  background-color: honeydew;
   outline: 1px solid grey;
   cursor: pointer;
   color: black;
