@@ -45,12 +45,13 @@ function Spore(addr) {
     // change appearance
   }
 
+  let _battWarning = false
   this.batteryLevel = function(batt) {
     //this.battery = batt
     this.lowBatt = false
 
     if (batt > 0) {
-      this.battery = (batt-2.75)/1.45*100     // convert to % (battery range 2.75 to 4.2)
+      this.battery = (batt-3.3)/0.9*100     // convert to % (battery range 3.2 to 4.2)
       let battIcon = 'fa-battery-full'
       if (this.battery < 75) {
         battIcon = 'fa-battery-three-quarters'
@@ -61,6 +62,13 @@ function Spore(addr) {
             if (this.battery < 20) {
               battIcon = 'fa-battery-empty'
               this.lowBatt = true
+              if (this.battery < 5) {
+                let _tog = setInterval(() => {
+                  _battWarning = !_battWarning
+                }, 520)
+                if (_battWarning) battIcon = 'fa-exclamation-triangle'
+                else battIcon = 'fa-plug'
+              }
             }
           }
         }
@@ -147,13 +155,14 @@ function initView() {
 
 ipcRenderer.on('update-spores', (event, conn, addr, batt, fw) => {
   if (addr < numSpores) {
-    console.log("connectado: %s, %s, %s, %s", conn, addr, batt, fw)
+    //console.log("connectado: %s, %s, %s, %s", conn, addr, batt, fw)
     if (conn) {
       spores[addr].onConnect()
       spores[addr].batteryLevel(batt)
       spores[addr].firmwareVersion(fw)
     }
     else {
+      console.log("connectado: %s, %s, %s, %s", conn, addr, batt, fw)
       spores[addr].onDisconnect()
       // //spores[addr].batteryLevel(0)
       // spores[addr].firmwareVersion('--')
