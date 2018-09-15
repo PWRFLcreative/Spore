@@ -79,6 +79,7 @@ let addressCounter = 0
         wss.clients.forEach((_ws) => {
           updateMonitor(_ws.isAlive, _ws.address, _ws.battery, _ws.firmware)
         })
+        remoteStatusConsole('devices-connected', wss.clients.size)
         mon.show()
       })
       mon.on('close', () => {
@@ -97,17 +98,35 @@ let addressCounter = 0
   //   setTimeout(() => {app.quit()}, 1000)
   // })
 
+
+
 /* ------- WEBSOCKETS: -------- */
   //https://www.npmjs.com/package/ws
   //https://www.npmjs.com/package/ws#how-to-detect-and-close-broken-connections
   // websocket terminal client:
   // > npm install -g wscat
   // > wscat -c <serverIP>:8080
+
+  // BACKUP PLAN for client tracking: https://medium.com/@willrigsbee/how-to-keep-track-of-clients-with-websockets-1a018c23bbfc
+  wss.clients.clear()
   wss.on('connection', (_ws, req) => {
     let remoteIP = req.connection.remoteAddress
-    console.log("[wss] %s connected", remoteIP)
-    remoteStatusConsole('devices-connected', wss.clients.size)  // this might not be accurate (if a device reconnects it returns expected size +1)
+    _ws.remoteIP = remoteIP
+    let counter = 0
+    wss.clients.forEach((client) => {
+        //if (client.readyState === WebSocket.OPEN)
+        if (client.remoteIP == _ws.remoteIP) counter++
+        if (counter > 1) {
+          console.log("[wss] repeat connection.")
+          _ws.terminate()
+          return
+        }
+    })
+    console.log("[wss] %s connected. %s", remoteIP, _ws.readyState)
+    // only do this in pong?
+    //remoteStatusConsole('devices-connected', wss.clients.size)  // this might not be accurate (if a device reconnects it returns expected size +1)
     prevClientsSize = wss.clients.size
+    remoteStatusConsole('devices-connected', wss.clients.size)    // notify GUI if # clients changes
 
     _ws.isAlive = true
     _ws.address = 999
@@ -115,30 +134,36 @@ let addressCounter = 0
     _ws.firmware = 0
     _ws.on('pong', heartbeatWS)
     _ws.on('message', onMessageWS)
-    _ws.on('error', (err) => console.log('[_ws] error: ' + err));
+    _ws.on('error', (err) => console.log('[_ws] error: ' + err))
+    //_ws.on( 'close', (errCode, errReason) =>) {
+    _ws.on( 'close', (errCode, errReason) => {
+        this.isAlive = false
+        //this.terminate()    // TODO close and terminate throw exceptions here
+        console.log( "Device disconnected, id: " + this.address + " reason: " + errReason )
+    })
   })
 
+  let prevClientsSize = 0
   function heartbeatWS() {
+      console.log ("[wss] received pong on " + this.address + ", state: " + this.readyState)
       this.isAlive = true     // 'this' refers to the device that sent the pong
       //remoteStatusConsole('devices-connected', wss.clients.size)
+      if (wss.clients.size != prevClientsSize) {
+          remoteStatusConsole('devices-connected', wss.clients.size)    // notify GUI if # clients changes
+      }
+      prevClientsSize = wss.clients.size
   }
 
-  let prevClientsSize = 0
   function pingWS() {
     wss.clients.forEach((_ws) => {
-      //updateMonitor(_ws.isAlive, _ws.address, _ws.battery, _ws.firmware) // not sure if better here or only on false?
+      //TODO: updateMonitor(_ws.isAlive, _ws.address, _ws.battery, _ws.firmware) // not sure if better here or only on false?
       if(_ws.isAlive === false) {
-        updateMonitor(_ws.isAlive, _ws.address, _ws.battery, _ws.firmware)
+        //updateMonitor(_ws.isAlive, _ws.address, _ws.battery, _ws.firmware)
         return _ws.terminate()
       }
       _ws.isAlive = false
-      _ws.ping(()=>{})  //pass noop function
+      _ws.ping( '', false, true )   // alt: _ws.ping(()=>{})  //pass noop function
     })
-    //console.log("[wss] ping")
-    if (wss.clients.size != prevClientsSize) {
-        remoteStatusConsole('devices-connected', wss.clients.size)
-    }
-    prevClientsSize = wss.clients.size
   }
 
   setInterval(() => { pingWS() }, config.ping_interval)
@@ -157,6 +182,7 @@ let addressCounter = 0
       }
 
       if (msg.type != undefined) {                  // check for "message type" key (should always have one)
+      //this.isAlive = true
         switch (msg.type) {
 
           case MSG_TYPE_CONNECT_INFO:
