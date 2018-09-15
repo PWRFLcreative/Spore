@@ -30,7 +30,7 @@ function Spore(addr) {
   this.onConnect = function() {
     this.connected = true
     this.el.classList.toggle("connected", this.connected)
-    console.log("connect %s", this.addr)
+    //console.log("connect %s", this.addr)
   }
 
   this.onDisconnect = function() {
@@ -155,14 +155,13 @@ function initView() {
 
 ipcRenderer.on('update-spores', (event, conn, addr, batt, fw) => {
   if (addr < numSpores) {
-    //console.log("connectado: %s, %s, %s, %s", conn, addr, batt, fw)
+    console.log("connectado: %s, %s, %s, %s", conn, addr, batt, fw)
     if (conn) {
       spores[addr].onConnect()
       spores[addr].batteryLevel(batt)
       spores[addr].firmwareVersion(fw)
     }
     else {
-      console.log("connectado: %s, %s, %s, %s", conn, addr, batt, fw)
       spores[addr].onDisconnect()
       // //spores[addr].batteryLevel(0)
       // spores[addr].firmwareVersion('--')
@@ -171,6 +170,9 @@ ipcRenderer.on('update-spores', (event, conn, addr, batt, fw) => {
 })
 
 function monitorRefresh() {
+  for ( let i = 0; i < numSpores; ++i ) {
+    spores[i].onDisconnect()
+  }
   ipcRenderer.send('monitorRefresh')
 }
 
