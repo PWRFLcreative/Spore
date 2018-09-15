@@ -92,11 +92,35 @@ let addressCounter = 0
     }
   }
   app.on('ready', createWindow)
-  // macOS close window but not app:
   // app.on('window-all-closed', () => {
-  //   console.log("ready to diiieeee!!!")
-  //   setTimeout(() => {app.quit()}, 1000)
+  //   console.log("all-closed")
+  //   shutdownApp()
   // })
+  // app.on('will-quit', () => {
+  //   console.log("quit")
+  //   shutdownApp()
+  // })
+  //
+  // function shutdownApp() {
+  //   // wss.clients.forEach((client) => {
+  //   //   client.close()
+  //   // }
+  //   // First sweep, soft close
+  //   wss.clients.forEach((_ws) => {
+  //     _ws.close()
+  //   })
+  //   setTimeout(() => {
+  //     // Second sweep, hard close
+  //     // for everyone who's left
+  //     wss.clients.forEach((_ws) => {
+  //       if ([_ws.OPEN, _ws.CLOSING].includes(_ws.readyState)) {
+  //         _ws.terminate()
+  //       }
+  //     })
+  //     console.log("dead")
+  //     app.quit()
+  //   }, 2000)
+  // }
 
 
 
@@ -113,23 +137,30 @@ let addressCounter = 0
     let remoteIP = req.connection.remoteAddress
     _ws.remoteIP = remoteIP
     let counter = 0
+    let double = false
     wss.clients.forEach((client) => {
-        //if (client.readyState === WebSocket.OPEN)
         if (client.remoteIP == _ws.remoteIP) counter++
-        if (counter > 1) {
-          console.log("[wss] repeat connection.")
-          _ws.terminate()
-          return
+        if (counter > 1) {                                                // if the device already exists
+          if (client.address == undefined || client.address < 0) {        // and the previous one did not configure properly
+            client.terminate()                                            // terminate the connection immediately (vs. client.close())
+            wss.clients.delete(client)                                    // delete it from the set 
+          }
+          else {
+            console.log("[wss] repeat connection, ", _ws.address)
+          }
+          double = true
         }
     })
+    if (double) { // do not finish setup if it's a double device!
+      return 0
+    }
     console.log("[wss] %s connected. %s", remoteIP, _ws.readyState)
-    // only do this in pong?
-    //remoteStatusConsole('devices-connected', wss.clients.size)  // this might not be accurate (if a device reconnects it returns expected size +1)
+
     prevClientsSize = wss.clients.size
     remoteStatusConsole('devices-connected', wss.clients.size)    // notify GUI if # clients changes
 
     _ws.isAlive = true
-    _ws.address = 999
+    _ws.address = -1
     _ws.battery = 0
     _ws.firmware = 0
     _ws.on('pong', heartbeatWS)
@@ -144,8 +175,9 @@ let addressCounter = 0
   })
 
   let prevClientsSize = 0
+  let clientsSize = 0
   function heartbeatWS() {
-      console.log ("[wss] received pong on " + this.address + ", state: " + this.readyState)
+      //console.log ("[wss] received pong on " + this.address + ", state: " + this.readyState)
       this.isAlive = true     // 'this' refers to the device that sent the pong
       //remoteStatusConsole('devices-connected', wss.clients.size)
       if (wss.clients.size != prevClientsSize) {
@@ -156,16 +188,16 @@ let addressCounter = 0
 
   function pingWS() {
     wss.clients.forEach((_ws) => {
-      //TODO: updateMonitor(_ws.isAlive, _ws.address, _ws.battery, _ws.firmware) // not sure if better here or only on false?
       if(_ws.isAlive === false) {
-        //updateMonitor(_ws.isAlive, _ws.address, _ws.battery, _ws.firmware)
-        return _ws.terminate()
+        //return _ws.terminate()
+        return
       }
       _ws.isAlive = false
-      _ws.ping( '', false, true )   // alt: _ws.ping(()=>{})  //pass noop function
+      if (_ws.readyState === WebSocket.OPEN) {
+        _ws.ping( '', false, true )   // alt: _ws.ping(()=>{})  //pass noop function
+      }
     })
   }
-
   setInterval(() => { pingWS() }, config.ping_interval)
 
   function onMessageWS(_msg) {
