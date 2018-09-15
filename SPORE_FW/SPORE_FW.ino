@@ -172,6 +172,9 @@ void loop() {
 
   switch(currentMode) {
     case TEST: {
+      if (e131.parsePacket()) {
+        // always parse udp data to avoid buffer overflows and subsequent random crashing
+      }
       static uint32_t testTimer;
       if (millis() - testTimer > 12) {
         testStepper++;
@@ -187,7 +190,11 @@ void loop() {
       pixels.Show();
       break;
     }
+    
     case SLEEP: {   // for now this is blackout!
+      if (e131.parsePacket()) {
+        // always parse udp data to avoid buffer overflows and subsequent random crashing
+      }
       RgbColor col = RgbColor(0, 0, 0);
         for (int i = 0; i < PixelCount; i++) {
           pixels.SetPixelColor(i, col);
@@ -195,6 +202,7 @@ void loop() {
       pixels.Show();
       break;
     }
+    
     case NORMAL:    // for now these all do the same thing!
     default:
       /* sACN receive: */

@@ -86,6 +86,7 @@ void setup() {
 
   /*********************************************/
   /* Hardware Test (blocking! - only for test) */
+  pinMode(BOOTLOAD_PIN, INPUT);
   Serial.printf("ENTERING TEST MODE\n");
   while(digitalRead(BOOTLOAD_PIN)) {
     for (uint16_t i = 0; i < pixels.PixelCount(); i++) {
