@@ -143,7 +143,7 @@ let addressCounter = 0
         if (counter > 1) {                                                // if the device already exists
           if (client.address == undefined || client.address < 0) {        // and the previous one did not configure properly
             client.terminate()                                            // terminate the connection immediately (vs. client.close())
-            wss.clients.delete(client)                                    // delete it from the set 
+            wss.clients.delete(client)                                    // delete it from the set
           }
           else {
             console.log("[wss] repeat connection, ", _ws.address)
@@ -174,16 +174,18 @@ let addressCounter = 0
     })
   })
 
+  let printDeviceNumber = false
   let prevClientsSize = 0
-  let clientsSize = 0
   function heartbeatWS() {
-      //console.log ("[wss] received pong on " + this.address + ", state: " + this.readyState)
+      console.log ("[wss] received pong on " + this.address + ", state: " + this.readyState)
       this.isAlive = true     // 'this' refers to the device that sent the pong
       //remoteStatusConsole('devices-connected', wss.clients.size)
-      if (wss.clients.size != prevClientsSize) {
-          remoteStatusConsole('devices-connected', wss.clients.size)    // notify GUI if # clients changes
+      //if (wss.clients.size != prevClientsSize) {
+      if (printDeviceNumber) {
+        remoteStatusConsole('devices-connected', wss.clients.size)    // notify GUI if # clients changes
+        printDeviceNumber = false
       }
-      prevClientsSize = wss.clients.size
+      // prevClientsSize = wss.clients.size
   }
 
   function pingWS() {
@@ -197,11 +199,12 @@ let addressCounter = 0
         _ws.ping( '', false, true )   // alt: _ws.ping(()=>{})  //pass noop function
       }
     })
+    printDeviceNumber = true
   }
   setInterval(() => { pingWS() }, config.ping_interval)
 
   function onMessageWS(_msg) {
-    let msg = 0;
+    let msg = 0
     if (_msg) {
       try {
         msg = JSON.parse(_msg)            // check for a valid JSON payload
@@ -210,7 +213,7 @@ let addressCounter = 0
         // this might need some cleanup still? -
         console.log("[wss] JSON parse error: ", e)
         remoteStatusConsole('print-message', 'JSON error')
-        return;
+        return
       }
 
       if (msg.type != undefined) {                  // check for "message type" key (should always have one)
@@ -224,7 +227,7 @@ let addressCounter = 0
               updateMonitor(this.isAlive, this.address, this.battery, this.firmware)
               console.log("[wss] device %s connected. FW:%s", msg.data.address, msg.data.firmwareVersion)
             }
-            break;
+            break
 
           case MSG_TYPE_REQUEST_ADDRESS:
             if (msg.data != undefined) {
@@ -247,18 +250,18 @@ let addressCounter = 0
               }
               this.send(JSON.stringify(response))
             }
-            break;
+            break
 
           case MSG_TYPE_BATTERY:
             if (msg.data != undefined) {
               this.battery = msg.data
               updateMonitor(this.isAlive, this.address, this.battery, this.firmware)
             }
-            break;
+            break
 
           default:
             console.log("[wss] message type: %s", msg.type)
-            break;
+            break
         }
       }
       else {
