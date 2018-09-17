@@ -156,7 +156,7 @@ let addressCounter = 0
     }
     console.log("[wss] %s connected. %s", remoteIP, _ws.readyState)
 
-    prevClientsSize = wss.clients.size
+    //prevClientsSize = wss.clients.size
     remoteStatusConsole('devices-connected', wss.clients.size)    // notify GUI if # clients changes
 
     _ws.isAlive = true
@@ -177,15 +177,15 @@ let addressCounter = 0
   let printDeviceNumber = false
   let prevClientsSize = 0
   function heartbeatWS() {
-      console.log ("[wss] received pong on " + this.address + ", state: " + this.readyState)
+      //console.log ("[wss] received pong on " + this.address + ", state: " + this.readyState)
       this.isAlive = true     // 'this' refers to the device that sent the pong
       //remoteStatusConsole('devices-connected', wss.clients.size)
-      //if (wss.clients.size != prevClientsSize) {
-      if (printDeviceNumber) {
+      if (wss.clients.size != prevClientsSize) {
+      //if (printDeviceNumber) {
         remoteStatusConsole('devices-connected', wss.clients.size)    // notify GUI if # clients changes
         printDeviceNumber = false
       }
-      // prevClientsSize = wss.clients.size
+      prevClientsSize = wss.clients.size
   }
 
   function pingWS() {
