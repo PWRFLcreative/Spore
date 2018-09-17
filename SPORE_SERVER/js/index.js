@@ -14,6 +14,7 @@ let status_console = document.getElementById('status-console')
 let button_fw      = document.getElementById('checkFirmwareButton')
 let button_sendip  = document.getElementById('sendIPButton')
 let button_scan    = document.getElementById('scanButton')
+let button_restart  = document.getElementById('restartButton')
 let button_mode0   = document.getElementById('modeButton0')
 let button_mode1   = document.getElementById('modeButton1')
 let button_mode2   = document.getElementById('modeButton2')
@@ -56,6 +57,11 @@ function scanDevices() {
     statusConsole("scanning devices (and configure addresses)..")
 }
 
+function restartDevices() {
+    ipcRenderer.send('restartDevices')
+    statusConsole("restarting devices...")
+}
+
 function setMode(arg) {
   ipcRenderer.send('setMode', arg)
   statusConsole("set mode to: " + arg)
@@ -83,6 +89,7 @@ ipcRenderer.on('firmware-version', (event, arg) => {
 button_fw.addEventListener('click', checkFirmware)    // maybe try dblclick!
 button_scan.addEventListener('click', scanDevices)
 button_sendip.addEventListener('click', sendServerIP)
+button_restart.addEventListener('click', restartDevices)
 button_monitor.addEventListener('click', openDeviceMonitor)
 button_mode0.addEventListener('click', () => {setMode(0)})
 button_mode1.addEventListener('click', () => {setMode(1)})

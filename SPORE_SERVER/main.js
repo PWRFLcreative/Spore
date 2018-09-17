@@ -304,6 +304,15 @@ let addressCounter = 0
     console.log("[ipc] scanning %s devices", wss.clients.size)
   })
 
+  ipcMain.on('restartDevices', (event) => {
+    let msg = {
+        type: MSG_TYPE_REBOOT
+    }
+    broadcastWSS(JSON.stringify(msg))
+    console.log("[ipc] rebooting %s devices", wss.clients.size)
+    broadcastRestartOSC()
+  })
+
   ipcMain.on('setMode', (event, arg) => {
     let msg = {
       type: MSG_TYPE_SET_MODE,
@@ -368,6 +377,13 @@ let addressCounter = 0
     socket.send(new Buffer(binary), 0, binary.byteLength, config.osc_port, ip.or(ip.address(), '0.0.0.255'))
     //console.log("[osc] osc sending my IP (" + ip.address() + ") to " + config.osc_host + ":" + config.osc_port)
     console.log("[osc] osc sending my IP (" + ip.address() + ") to " + ip.or(ip.address(), '0.0.0.255') + ":" + config.osc_port)
+  }
+
+  function broadcastRestartOSC() {
+    const message = new OSC.Message('/restart')
+    const binary = message.pack()
+    socket.send(new Buffer(binary), 0, binary.byteLength, config.osc_port, ip.or(ip.address(), '0.0.0.255'))
+    console.log("[osc] broadcast restart")
   }
 
 

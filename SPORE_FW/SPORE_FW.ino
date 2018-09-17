@@ -243,6 +243,7 @@ void loop() {
     }
     if (!inMsg.hasError()) {
       inMsg.route("/server", updateServerIP);
+      inMsg.route("/restart", restartOSC);
     }
   }
 

@@ -38,7 +38,7 @@ enum MsgType : uint8_t  {
 volatile uint8_t testStepper = 0;      // for the test fade cycle
 
 
-/* ---- OSC Callback: ---- */
+/* ---- OSC Callback (server IP): ---- */
 void updateServerIP(OSCMessage &msg, int addressOffset) {
   bool _serverChanged = false;
   for (int i = 0; i < 4; i++) {
@@ -61,6 +61,16 @@ void updateServerIP(OSCMessage &msg, int addressOffset) {
   else {
     Serial.printf("[osc] websocket server unchanged\n");
   }
+}
+/* ---- OSC Callback (restart): ---- */
+void restartOSC(OSCMessage &msg, int addressOffset) {
+  if (msg.isInt(0)) {
+    if (msg.getInt(0)) {
+      // reserved for future use
+    }
+  }
+  Serial.printf("[osc] received OSC-based restart (probably broadcast, probably because some of us are not behaving)\n");
+  ESP.restart();
 }
 
 
