@@ -2,9 +2,12 @@
   "websocket_port" : "8080",
   "osc_port" : 7777,
 
-  "firmware_version" : "305",
+  "firmware_version" : "308",
   "firmware_filename" : "spore_fw",
   "firmware_server_port" : "8888",
 
-  "ping_interval" : "5000"
+  "ping_interval" : "5000",
+  "reset_broadcast": true,
+
+  "device_startMode" : 1
 }

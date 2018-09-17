@@ -305,12 +305,28 @@ let addressCounter = 0
   })
 
   ipcMain.on('restartDevices', (event) => {
+    if (config.reset_broadcast) {
+      broadcastRestartOSC()
+      console.log("[ipc] rebooting ALL devices")
+    } else {
+      let msg = {
+          type: MSG_TYPE_REBOOT
+      }
+      broadcastWSS(JSON.stringify(msg))
+      console.log("[ipc] rebooting %s devices", wss.clients.size)
+    }
+  })
+
+  ipcMain.on('configDevices', (event) => {
     let msg = {
-        type: MSG_TYPE_REBOOT
+        type: MSG_TYPE_CONFIG,
+        data: { startmode: config.device_startMode,
+                ssid: 0,
+                password: 0
+              }
     }
     broadcastWSS(JSON.stringify(msg))
-    console.log("[ipc] rebooting %s devices", wss.clients.size)
-    broadcastRestartOSC()
+    console.log("[ipc] sending config to devices. startupMode: ", config.device_startMode)
   })
 
   ipcMain.on('setMode', (event, arg) => {

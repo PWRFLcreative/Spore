@@ -86,13 +86,14 @@ void setup() {
   Serial.printf("HW: %s%s\n", HW_VERSION, HW_PHASE);
   Serial.printf("(c)2018 PWRFL\n\n");         // pick open source license
 
-  EEPROM.begin(512);
+  EEPROM.begin(512);              // address = 0, ip = 1,2,3,4, mode = 5
   //EEPROM.get(0, address);
   address = EEPROM.read(0);
   deviceName.concat(address);
   for (int i = 0; i < 4; i++) {
     serverIP[i] = EEPROM[i+1];    // + 1 because "address" is stored at 0
   }
+  //currentMode = (Mode)EEPROM[5];    // see bottom of setup()
 
   /* LEDs */
   delay(100);
@@ -152,7 +153,8 @@ void setup() {
   Serial.printf("%s (%s) ready. \n", deviceName.c_str(), WiFi.macAddress().c_str());
   Serial.printf("\n---\n\n");
 
-  currentMode = TEST;
+  //currentMode = TEST;
+  currentMode = (Mode)EEPROM[5];
   yield();
 }
 

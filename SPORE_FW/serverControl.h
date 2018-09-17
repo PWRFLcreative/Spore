@@ -172,7 +172,10 @@ bool deserializeJSON(uint8_t * json) {
           // (not 100% sure yet if/how we'll use config)
           uint8_t _newSSID = root["data"]["ssid"];          // ** placeholder **
           uint8_t _newPass = root["data"]["password"];      // ** placeholder **
-          Serial.printf("[ws] <CONFIG>: %u, %u\n", _newSSID, _newPass);
+          uint8_t startMode = root["data"]["startmode"];
+          EEPROM[5] = startMode;
+          EEPROM.commit();
+          Serial.printf("[ws] <CONFIG>: %u, %u, %u\n", _newSSID, _newPass, startMode);
         }
         break;
       case REBOOT:
