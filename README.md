@@ -13,17 +13,11 @@ With lots of options for input and output, Spore has many other possibilities fo
 
 ## Quick Start
 1. Make sure you have at least one charged Spore, and have completed the [install guide](#installationrun-instructions) for the Config App and [Network setup](#network-setup).
-
 2. Once you’re all set up, open the Config App, and click `Send Server IP`. This broadcasts your computer's IP to all Spores on the network so that they can connect to you.
-
 3. Next click `Scan for Changes`. This will scan your network and assign a unique address to all connected Spores, starting at `1`.
-
 4. Click `Spore Status` to open the monitor, this will show you which Spores are connected, their battery level, and firmware version.
-
 5. Use the mode switches to make sure they’re all communicating properly, e.g. switch from blackout to test mode.
-
 6. Switch them into Normal Mode so they can receive sACN data.
-
 7. Send sACN over multicast. We’ve used [QLC+](https://www.qlcplus.org/) and [sACN View](https://sourceforge.net/projects/sacnview/) to test, but you could also use something like Touchdesigner.
 
 That’s it! Now that your Spores are set up and receiving sACN, you can map them with Lightwork, or use them as you’d like.
