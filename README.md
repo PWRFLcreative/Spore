@@ -33,9 +33,17 @@ That’s it! Now that your Spores are set up and receiving sACN, you can map the
   + [Network Setup](#network-setup)
 * [Firmware](#firmware)
   + [Dev Requirements](#dev-requirements)
-  + [Installation/Build Instructions](#installationbuild-instructions)
+  + [Compile/Upload Instructions](#compileupload-instructions)
 * [Software](#software)
+  + [Feature List](#feature-list)
+  + [Dev Requirements](#dev-requirements)
+  + [Installation/Run Instructions](#installationrun-instructions)
   + [OTA Firmware Updates](#ota-firmware-updates)
+  + [Function Reference](#function-reference)
+* [FAQ](#faq)
+* [Known Issues & Workarounds](#known-issues--workarounds)
+* [TODO](#todo)
+* [Credits](#credits)
 
 # Hardware
 This section covers info on building and modifying the hardware, including the PCBs, batteries, prototyping, network setup, and enclosures.  
