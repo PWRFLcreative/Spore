@@ -13,12 +13,13 @@ With lots of options for input and output, Spore has many other possibilities fo
 
 ## Quick Start
 1. Make sure you have at least one charged Spore, and have completed the [install guide](#installationrun-instructions) for the Config App and [Network setup](#network-setup).
-2. Once you’re all set up, open the Config App, and click `Send Server IP`. This broadcasts your computer's IP to all Spores on the network so that they can connect to you.
-3. Next click `Scan for Changes`. This will scan your network and assign a unique address to all connected Spores, starting at `1`.
-4. Click `Spore Status` to open the monitor, this will show you which Spores are connected, their battery level, and firmware version.
-5. Use the mode switches to make sure they’re all communicating properly, e.g. switch from blackout to test mode.
-6. Switch them into Normal Mode so they can receive sACN data.
-7. Send sACN over multicast. We’ve used [QLC+](https://www.qlcplus.org/) and [sACN View](https://sourceforge.net/projects/sacnview/) to test, but you could also use something like Touchdesigner.
+2. Join your newly created network.
+3. Once you’re all set up, open the Config App, and click `Send Server IP`. This broadcasts your computer's IP to all Spores on the network so that they can connect to you.
+4. Next click `Scan for Changes`. This will scan your network and assign a unique address to all connected Spores, starting at `1`.
+5. Click `Spore Status` to open the monitor, this will show you which Spores are connected, their battery level, and firmware version.
+6. Use the mode switches to make sure they’re all communicating properly, e.g. switch from blackout to test mode.
+7. Switch them into Normal Mode so they can receive sACN data.
+8. Send sACN over multicast. We’ve used [QLC+](https://www.qlcplus.org/) and [sACN View](https://sourceforge.net/projects/sacnview/) to test, but you could also use something like Touchdesigner.
 
 That’s it! Now that your Spores are set up and receiving sACN, you can map them with Lightwork, or use them as you’d like.
 
@@ -134,11 +135,12 @@ Additionally, the Unifi Controller and the server both want to use port 8080. Fo
 This section contains information about the Spore firmware. It was written in Arduino which makes it pretty easy to tinker with! Every Spore uses the exact same firmware - addresses are modified using the Config App.
 
 ## Dev Requirements
+Reminder: [How to Install Arduino Libraries](https://www.arduino.cc/en/Guide/Libraries)
   * [Arduino](https://www.arduino.cc/en/Main/Software) v1.8.7+
-  * [Esp8266 Core](https://github.com/esp8266/Arduino) v2.4.2 (may not work with older *or* newer version)
+  * [Esp8266 Core](https://github.com/esp8266/Arduino#installing-with-boards-manager) v2.4.2 (may not work with older *or* newer version)
   * These Arduino libraries:
     + [Arduino JSON](https://github.com/bblanchon/ArduinoJson) v5.13.2
-    + [arduinoWebSockets](https://github.com/Links2004/arduinoWebSockets) v2.1.1 (included because it has been modified for [async](https://github.com/Links2004/arduinoWebSockets#esp-async-tcp))
+    + [WebSockets](https://github.com/Links2004/arduinoWebSockets) v2.1.1 (included because it has been modified for [async](https://github.com/Links2004/arduinoWebSockets#esp-async-tcp))
     + [NeoPixelBus](https://github.com/Makuna/NeoPixelBus) v2.3.2
     + [E131](https://github.com/forkineye/E131) v1.0.0
     + [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP) v1.2.0 (not in library manager)
@@ -148,14 +150,18 @@ This section contains information about the Spore firmware. It was written in Ar
 
 ## Compile/Upload Instructions
   * Install Arduino, esp8266 core, and the above libraries
-  * Set up Arduino Board options (`<Arduino Menu>/Tools/`):  
-    <img src="doc/images/ArduinoBoardSettings.png" alt="Arduino Board Settings" width="300"/>
-  * Plug in your FTDI and select the correct port (some USB-Serial converters can handle a higher `Upload Speed`)
+  * Set up Arduino Board options (`Arduino Menu-> Tools/`)  
+    <img src="doc/images/ArduinoBoardSettings.png" alt="Arduino Board Settings" width="300"/>  
+    *Note: the order of these settings is not always the same. I have no idea why.*
+  * Plug in your FTDI (**check the orientation**) and select the correct port (some USB-Serial converters can handle a higher `Upload Speed`)
   * Set correct SSID and Password in `wifi_config.h` (changes in this file are not tracked by git, so you have to set on every new computer)
+  * Open the Arduino Serial Monitor and set the baud rate to `115200`
+  * Hold the bootload button while resetting the board, release bootload, then `Arduino Menu-> Sketch/Upload`.
+  * ⚠️ **YOU MUST reset the board at least once after uploading new firmware with FTDI or OTA WILL NOT WORK**
+  * Use the Serial Monitor to make sure the Spore is connecting to your network and receiving commands from the Config App. Disconnect the FTDI whenever you are done looking at debug printouts!
 
-Hold the bootload button while resetting the board, release bootload, then `<Arduino Menu>/Sketch/Upload`.
-
-⚠️ **YOU MUST reset the board at least once after uploading new firmware with FTDI or OTA WILL NOT WORK** ⚠️
+>**NOTE:** Some USB-Serial converters can prevent the LEDs from updating. If your LEDs seem stuck, unplug your FTDI/USB-Serial Converter.  
+>Also: don't forget to download the driver for your USB-Serial converter if it is new!
 
 
 # Software
@@ -193,9 +199,9 @@ In the near future, we will export compiled binaries for all platforms, but for 
 
 
 ## OTA Firmware Updates
-The OTA Firmware updates the firmware on ALL SPOREs connected to the configurator. When the button is pressed, the server sends a message to each SPORE with the latest version number. The SPORE checks to see if this is newer than it’s current version. If yes, then it downloads and installs whichever firmware binary is in the `<this repo>/configApp/firmware/ folder.`
+The OTA Firmware updates the firmware on ALL SPOREs connected to the configurator. When the button is pressed, the server sends a message to each SPORE with the latest version number. The SPORE checks to see if this is newer than it’s current version. If yes, then it downloads and installs whichever firmware binary is in the `<this repo>/configApp/firmware/` folder.
 
-  * in Arduino, export the firmware binary (`sketch/Export Compiled Binary`), and copy the output to `configApp/firmware/`
+  * in Arduino, export the firmware binary (`Menu-> Sketch/Export Compiled Binary`), and copy the output (`<this repo/firmware/Spore/Spore.ino.generic.bin`) to `configApp/firmware/`
   * rename the firmware file to `spore_fw.bin`
   * **After copy and rename:** open `config.json` in the `configApp` folder and change the value of `firmware_version` to match the constant `FW_VERSION` in the `settings.h` of the sensor firmware you just compiled. This number should always be a single `int`, i.e. for version 0.6.01: `601`, for version 1.0.05: `1005`.
   * restart the Config App
@@ -218,9 +224,11 @@ Breaking OTA or soft-bricking devices requires updating firmware with FTDI for a
 
 **Send Server IP** (`UDP OSC`) - broadcast your IP so any Spores on the network can connect to you (This will be automatic on scanning for changes, in a future update). Only needed when switching between computers or networks.
 
-**Restart Devices** TODO FIX THIS: (`UDP OSC`(all) or `websocket`(connected); set in `config.json`)- broadcast a restart message to all Spores on the network. Because this is a UDP broadcast, it will even restart Spores that are having trouble connecting. Feel free to spam it a bit if you are really stuck.
+**Restart Devices** (`UDP OSC`)- broadcast a restart message to all Spores on the network. Because this is a UDP broadcast, it will even restart Spores that are having trouble connecting. Feel free to spam it a bit if you are really stuck. *Note: in `config.json`, you can change `reset_broadcast`. `true` brodcasts to all devices over `UDP OSC`, false sends only to connected devices via `websocket`*
 
 **Send Config** (`websocket`) - Send config packet, containing the relevant data from config.json. Currently used to set boot mode on all Spores (Normal: 0, Test: 1, Blackout: 2). Spores store this info in EEPROM and will remember it between power cycles until you change it explicitly.
+
+**Console** (`internal messages`) - This is an output of some system information. The count (`## spore(s) connected`) is not 100% reliable at the moment (related to handshake bug) but it's pretty close. The Monitor is more accurate.
 
 
 ### Modes:
@@ -299,11 +307,11 @@ Individual contributors include:
   * Alex Beim - Spore Concept
   * Andrea Buttarini - Spore Design
 
-Special thanks to help from our volunteers, including:
+Special thanks to generous help from volunteers, including:
 
   * Yasu Harada
   * Marie Harada
   * Noel Rubin
-  * Ikbel (@imikbel)
+  * Ikbel Hammami
 
 ![Creative BC Logo](doc/images/CreativeBC_BC_joint_RGB.png)
