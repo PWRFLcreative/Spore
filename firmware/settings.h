@@ -2,10 +2,10 @@
 #define SETTINGS_H
 
 
-#include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>    // necessary?
+#include <WiFi.h>
+#include <ESPmDNS.h>    // necessary?
 #include <WiFiUDP.h>
-#include <EEPROM.h>
+//#include <EEPROM.h> Deprecated, replaced with preferences in ESP32
 
 #include "wifi_config.h"   
 // to track and stop tracking config.h: 
@@ -22,7 +22,8 @@ const char* AP_SSID  = "SPORE-TEST";
 const char* ssid     = WIFI_SSID;         // ssid from wifi_config.h
 const char* password = WIFI_PASSWORD;     // password from wifi_config.h
 String deviceName    = "Spore_";          // used for DHCP
-IPAddress serverIP(10, 10, 10, 100);      // server IP address
+//IPAddress serverIP(10, 10, 10, 100);      // server IP address
+String serverIP("10.10.10.100");
 uint16_t wsPort      = 8080;              // websocket connection port
 uint16_t oscPort = 7777;                  // osc listen port to receive server config broadcast
 

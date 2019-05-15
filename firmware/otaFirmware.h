@@ -2,8 +2,8 @@
 #define OTA_FIRMWARE_H
 
 #include "settings.h"
-#include <ESP8266HTTPClient.h>
-#include <ESP8266httpUpdate.h>
+#include <HTTPClient.h>
+#include <HTTPUpdate.h>
 
 bool checkForNewFirmware(String fwUrlBase, String fwFilename) {
   String fwURL = String(fwUrlBase);

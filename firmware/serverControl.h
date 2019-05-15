@@ -41,19 +41,31 @@ volatile uint8_t testStepper = 0;      // for the test fade cycle
 /* ---- OSC Callback (server IP): ---- */
 void updateServerIP(OSCMessage &msg, int addressOffset) {
   bool _serverChanged = false;
-  for (int i = 0; i < 4; i++) {
-    if (msg.isInt(i)) {
-      serverIP[i] = msg.getInt(i);
-      if (serverIP[i] != EEPROM[i+1]) {
-        EEPROM[i+1] = serverIP[i];
-        _serverChanged = true;
-      }
+
+  if (msg.isString(0)) {    //TODO - find out how to convert this
+    serverIP = msg.getString(0);
+    if (serverIP != preferences.getString("serverIP")) {
+    settings.putString("serverIP", serverIP);
+      _serverChanged = true;
     }
   }
+
+
+  //    for (int i = 0; i < 4; i++) {
+  //    if (msg.isInt(i)) {
+  //        serverIP[i] = msg.getInt(i);
+  //        if (serverIP[i] != EEPROM[i + 1]) { 
+  //          EEPROM[i + 1] = serverIP[i];
+  //          _serverChanged = true;
+  //        }
+  //      }
+  //    }
+  
   if (_serverChanged) {
-    EEPROM.commit();
-    webSocket.begin(serverIP.toString(), wsPort, "/");
-    Serial.printf("[osc] New Websocket server at: %s:%u\n", serverIP.toString().c_str(), wsPort);
+    //EEPROM.commit();
+    preferences.end();
+    webSocket.begin(serverIP, wsPort, "/");
+    Serial.printf("[osc] New Websocket server at: %s:%u\n", serverIP.c_str(), wsPort);
     //delay(10);
     yield();
     ESP.restart();
@@ -63,7 +75,7 @@ void updateServerIP(OSCMessage &msg, int addressOffset) {
   }
 }
 /* ---- OSC Callback (restart): ---- */
-void restartOSC(OSCMessage &msg, int addressOffset) {
+void restartOSC(OSCMessage & msg, int addressOffset) {
   if (msg.isInt(0)) {
     if (msg.getInt(0)) {
       // reserved for future use
@@ -77,7 +89,7 @@ void restartOSC(OSCMessage &msg, int addressOffset) {
 /* ---- websocket<-->JSON functions ---- */
 const uint16_t jsonSendSize = 256;
 void serializeJSON_connected(char * json) {
-  StaticJsonBuffer<jsonSendSize> jsonBuffer;
+  StaticJsonDocument<jsonSendSize> doc;
   JsonObject& root = jsonBuffer.createObject();
   root["type"] = (uint8_t)CONNECT_INFO;
   JsonObject& data = root.createNestedObject("data");
@@ -88,7 +100,7 @@ void serializeJSON_connected(char * json) {
 }
 
 void serializeJSON_scan(char * json) {
-  StaticJsonBuffer<jsonSendSize> jsonBuffer;
+  StaticJsonDocument<jsonSendSize> doc;
   JsonObject& root = jsonBuffer.createObject();
   root["type"] = (uint8_t)REQUEST_ADDRESS;
   root["data"] = WiFi.macAddress();
@@ -97,7 +109,7 @@ void serializeJSON_scan(char * json) {
 }
 
 void serializeJSON_battery(char *json) {
-  StaticJsonBuffer<jsonSendSize> jsonBuffer;
+  StaticJsonDocument<jsonSendSize> doc;
   JsonObject& root = jsonBuffer.createObject();
   root["type"] = (uint8_t)BATTERY;
   root["data"] = batteryVoltage;
@@ -106,10 +118,10 @@ void serializeJSON_battery(char *json) {
 }
 
 bool deserializeJSON(uint8_t * json) {
-  StaticJsonBuffer<512> jsonBuffer;     // actually only needs to be about 240 bytes, extra reserved for future use (or just because I have the space..). (http://arduinojson.org/assistant/)
+  StaticJsonDocument<512> doc;     // actually only needs to be about 240 bytes, extra reserved for future use (or just because I have the space..). (http://arduinojson.org/assistant/)
   JsonObject& root = jsonBuffer.parseObject(json);
-//const char* exampleNestedValue = root["object"]["key"];
-//const char* exampleValue = root["key"];
+  //const char* exampleNestedValue = root["object"]["key"];
+  //const char* exampleValue = root["key"];
   if (!root.success()) {
     Serial.printf("[ws] JSON parseObject() failed.\n");
     return false;
@@ -121,8 +133,9 @@ bool deserializeJSON(uint8_t * json) {
       case SET_ADDRESS: {
           uint8_t _addr = root["data"];                     // ** placeholder **
           address = _addr;
-          EEPROM.write(0, address);
-          EEPROM.commit();
+          //EEPROM.write(0, address);
+          //EEPROM.commit();
+          preferences.putUInt("address", address);
           Serial.printf("[ws] <SET_ADDRESS>: %u\n", address);
         }
         break;
@@ -143,12 +156,12 @@ bool deserializeJSON(uint8_t * json) {
             case SLEEP: {
                 Serial.printf("SLEEP\n");
               }
-            break;
+              break;
             default:
               Serial.printf("err: (unknown mode)\n");
               break;
           }
-//          Serial.printf("[ws] <SET_MODE>: %u\n", _mode);
+          //          Serial.printf("[ws] <SET_MODE>: %u\n", _mode);
         }
         break;
       case CHECK_FIRMWARE: {
@@ -173,8 +186,9 @@ bool deserializeJSON(uint8_t * json) {
           uint8_t _newSSID = root["data"]["ssid"];          // ** placeholder **
           uint8_t _newPass = root["data"]["password"];      // ** placeholder **
           uint8_t startMode = root["data"]["startmode"];
-          EEPROM[5] = startMode;
-          EEPROM.commit();
+          //EEPROM[5] = startMode;
+          //EEPROM.commit();
+          preferences.putString("mode", startMode)
           Serial.printf("[ws] <CONFIG>: %u, %u, %u\n", _newSSID, _newPass, startMode);
         }
         break;
