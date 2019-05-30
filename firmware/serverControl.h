@@ -50,7 +50,6 @@ void updateServerIP(OSCMessage &msg, int addressOffset) {
     }
   }
 
-
   //    for (int i = 0; i < 4; i++) {
   //    if (msg.isInt(i)) {
   //        serverIP[i] = msg.getInt(i);

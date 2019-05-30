@@ -1,0 +1,7 @@
+{
+    "board": "esp32:esp32:featheresp32",
+    "configuration": "FlashFreq=80,UploadSpeed=921600,DebugLevel=none",
+    "programmer": "USBtinyISP",
+    "port": "COM8",
+    "sketch": "firmware.ino"
+}
