@@ -10,7 +10,7 @@
   "author": "Brendan",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^2.0.9",
+    "electron": "^11.5.0",
     "electron-tooltip": "^1.1.5"
   },
   "dependencies": {
