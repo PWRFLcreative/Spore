@@ -69,7 +69,7 @@ This section covers info on building and modifying the hardware, including the P
   * Over-The-Air (OTA) updateable firmware (all at once!)
 
 ## Dev Requirements
-Install KiCad and open it! -- The PCB was designed in [KiCad 4](http://kicad-pcb.org/). We recently did test import to KiCad 5 which seemed OK, but we haven’t tested exported files/gerbers yet. We usually check our gerbers using [gerbv](https://sourceforge.net/projects/gerbv/) and/or GerbView included in KiCad 5 (the one in KiCad 4 is not great).  
+Install KiCad and open it! -- The PCB was designed in [KiCad 4](http://kicad.org/). We recently did test import to KiCad 5 which seemed OK, but we haven’t tested exported files/gerbers yet. We usually check our gerbers using [gerbv](https://sourceforge.net/projects/gerbv/) and/or GerbView included in KiCad 5 (the one in KiCad 4 is not great).  
 
 ### If You Don't Have a Spore:
 If you want to play with the firmware without actually building one of the boards, this is our recommended test hardware (but use what you have):
