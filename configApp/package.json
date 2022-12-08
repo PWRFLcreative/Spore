@@ -16,7 +16,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.3.1",
     "electron-reload": "^1.2.5",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "ip": "^1.1.5",
     "osc-js": "^1.2.2",
     "ws": "^6.0.0"
